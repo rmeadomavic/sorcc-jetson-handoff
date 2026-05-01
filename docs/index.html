@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Self-serve guide for SORCC graduates: from a stock Jetson Orin Nano Super dev kit to a working JetPack 6 system with the SORCC stack." />
+<link rel="stylesheet" href="assets/sorcc.css" />
+</head>
+<body data-resume-label="Landing · SORCC Jetson Handoff" data-resume-href="index.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="page">
+
+  <p class="doc-eyebrow">Class 02-26 · Volume 1 · v1.0</p>
+  <h1 class="doc-title">From a stock dev kit to a working Jetson, in five sections.</h1>
+  <p class="doc-lede">
+    Take your Jetson Orin Nano Super Developer's Kit from JetPack 5.1.x out of the box to
+    JetPack 6.x in MAXN Super power mode. Install whichever pieces of the SORCC stack you
+    actually want. Read in order the first time. Jump where you need after that.
+  </p>
+
+  <div class="resume" data-resume-slot>
+    <span class="tag">Resume</span>
+    <div class="resume__body">
+      <div class="resume__title" data-resume-title>Section 01 · Flash &amp; update</div>
+      <div class="resume__sub" data-resume-sub>Pick up where you left off.</div>
+    </div>
+    <a class="btn btn--primary" href="01-flash-and-update/index.html" data-resume-link>Continue ▸</a>
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">Read these first · three known traps</p>
+    <div class="section-label__rule"></div>
+  </div>
+  <p>If you only read three things in this repo, read these. Each one has bitten a real student.</p>
+
+  <div class="trap-grid trap-grid--2">
+    <div class="trap">
+      <div class="trap__head">
+        <span class="trap__num">Trap 01</span>
+        <span class="trap__title">QSPI before JetPack 6.</span>
+      </div>
+      <div class="trap__body"><p>
+        Brand-new Orin Nano dev kits cannot boot a JetPack 6 SD card until you flash QSPI from
+        a JetPack 5.1.3 card first. The board powers on and stares at you with a blank screen.
+        See <a href="01-flash-and-update/01-qspi-update.html">Section 01.01</a>.
+      </p></div>
+    </div>
+    <div class="trap">
+      <div class="trap__head">
+        <span class="trap__num">Trap 02</span>
+        <span class="trap__title">Lowercase L, not number 1.</span>
+      </div>
+      <div class="trap__body"><p>
+        The package name is <code class="inline">nvidia-l4t-jetson-orin-nano-qspi-updater</code>.
+        That is <code class="inline">l4t</code>, not <code class="inline">14t</code>. apt fails with
+        "Unable to locate package" on a typo, with no other clue. Tab-complete to be safe.
+      </p></div>
+    </div>
+    <div class="trap">
+      <div class="trap__head">
+        <span class="trap__num">Trap 03</span>
+        <span class="trap__title">QSPI updater is single-shot per card.</span>
+      </div>
+      <div class="trap__body"><p>
+        Reusing the same JP 5.1.3 card on a second Jetson? Add
+        <code class="inline">--reinstall</code> or the post-install hook will be a silent no-op
+        and the QSPI stays untouched.
+      </p></div>
+    </div>
+    <div class="trap">
+      <div class="trap__head">
+        <span class="trap__num">Heads up</span>
+        <span class="trap__title">No em dashes, no shortcuts.</span>
+      </div>
+      <div class="trap__body"><p>
+        Every command in every doc is shown in full. Copy buttons on terminal blocks strip the
+        <code class="inline">$</code> prompt for you. Use them. Typos are the #1 cause of
+        "it didn't work."
+      </p></div>
+    </div>
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">Where should you start?</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <div class="tree">
+    <div class="tree__item is-current">
+      <div class="tree__q">Has this Jetson ever booted JetPack 6.x?</div>
+      <div class="tree__hint">If no &rarr; start at Section 01. Check with <code class="inline">cat /etc/nv_tegra_release</code> (look for # R36).</div>
+    </div>
+    <div class="tree__item">
+      <div class="tree__q">Is Docker plus the NVIDIA container toolkit installed?</div>
+      <div class="tree__hint">If no &rarr; Section 02 base bootstrap.</div>
+    </div>
+    <div class="tree__item">
+      <div class="tree__q">Are you wiring a Pixhawk flight controller?</div>
+      <div class="tree__hint">If yes &rarr; Section 03. Otherwise skip it.</div>
+    </div>
+    <div class="tree__item">
+      <div class="tree__q">Which apps do you want?</div>
+      <div class="tree__hint">Hydra Detect &middot; Ollama &middot; ComfyUI &mdash; pick any. See Section 04.</div>
+    </div>
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">The path · five sections</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <div class="card-grid">
+    <a class="card" href="00-before-you-start/index.html">
+      <span class="card__num">Section 00</span>
+      <span class="card__title">Before you start</span>
+      <span class="card__desc">What's in the box. What you need to gather. When to ask for help.</span>
+      <span class="card__meta"><span>~5 min</span><span>3 docs</span></span>
+    </a>
+    <a class="card" href="01-flash-and-update/index.html">
+      <span class="card__num">Section 01</span>
+      <span class="card__title">Flash &amp; update</span>
+      <span class="card__desc">QSPI bootloader. JetPack 6.x flash. First-boot wizard. MAXN Super.</span>
+      <span class="card__meta"><span>~90 min</span><span>4 steps</span></span>
+    </a>
+    <a class="card" href="02-base-system/index.html">
+      <span class="card__num">Section 02</span>
+      <span class="card__title">Base system</span>
+      <span class="card__desc">Docker, NVIDIA Container Toolkit, group permissions, optional Tailscale.</span>
+      <span class="card__meta"><span>~20 min</span><span>2 steps</span></span>
+    </a>
+    <a class="card" href="03-hardware/index.html">
+      <span class="card__num">Section 03</span>
+      <span class="card__title">Hardware <em style="font-style:italic;color:var(--mid-green)">· optional</em></span>
+      <span class="card__desc">Wiring a Pixhawk flight controller. Pinout, diagram, MAVLink test.</span>
+      <span class="card__meta"><span>~30 min</span><span>2 steps</span></span>
+    </a>
+    <a class="card" href="04-apps/index.html">
+      <span class="card__num">Section 04</span>
+      <span class="card__title">Apps</span>
+      <span class="card__desc">Hydra Detect &middot; Ollama + Open WebUI &middot; ComfyUI. Pick what you want.</span>
+      <span class="card__meta"><span>15-60 min ea.</span><span>3 apps</span></span>
+    </a>
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">Hardware scope</p>
+    <div class="section-label__rule"></div>
+  </div>
+  <p>
+    This guide covers exactly <strong>one</strong> configuration. Other Jetsons (Nano 4GB, NX, AGX) might
+    mostly work but are not tested. The 4GB Nano in particular will run out of memory in the apps section.
+  </p>
+
+  <table class="modern">
+    <thead>
+      <tr><th>Component</th><th>Spec</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Compute</td><td>NVIDIA Jetson Orin Nano Super 8GB (dev-kit carrier board)</td></tr>
+      <tr><td>OS</td><td>JetPack 6.x (currently 6.2.1, L4T R36.4.x)</td></tr>
+      <tr><td>Power mode</td><td>MAXN Super (25W)</td></tr>
+      <tr><td>Storage</td><td>microSD, 64 GB+ UHS-I, from a known brand</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-label">
+    <p class="section-label__text">Quick check · run on your Jetson</p>
+    <div class="section-label__rule"></div>
+  </div>
+  <p>This single command tells you exactly which step you are on.</p>
+  <div class="term">
+    <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash scripts/preflight.sh
+
+<span class="ok">OK</span>   JetPack 6.x (L4T R36.4.x)
+<span class="ok">OK</span>   Power mode: MAXN_SUPER
+<span class="ok">OK</span>   Docker installed
+<span class="bad">FAIL</span> nvidia-container-toolkit missing
+<span class="comment">     run 02-base-system/01-base-bootstrap.sh</span>
+</pre>
+  </div>
+  <p>
+    If preflight passes, skip to <a href="04-apps/index.html">Section 04</a> and pick what you want
+    to install. If it fails, it tells you which doc fixes it.
+  </p>
+
+  <div class="section-label">
+    <p class="section-label__text">Paste-in router · let the page route you</p>
+    <div class="section-label__rule"></div>
+  </div>
+  <p>
+    Stuck on something? Paste the failing output below. The page reads it for known signatures and
+    points you at the right page. Nothing is sent off your machine; the matcher runs in your browser.
+  </p>
+  <div class="router">
+    <label class="router__label" for="router-input">Paste preflight output, <code>dmesg</code> snippet, <code>apt</code> error, or boot log</label>
+    <textarea id="router-input" class="router__input" rows="8" spellcheck="false" placeholder="$ bash scripts/preflight.sh
+FAIL  nvidia-container-toolkit missing
+     run 02-base-system/01-base-bootstrap.sh
+
+— or —
+
+[  4.221] tegra-i2c 3160000.i2c: no acknowledge from address 0x40
+[  4.225] pca9685 1-0040: failed to read register"></textarea>
+    <div class="router__actions">
+      <button class="router__btn router__btn--primary" data-router-go>Match</button>
+      <button class="router__btn" data-router-clear>Clear</button>
+      <span class="router__hint">Or press <kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
+    </div>
+    <div class="router__results" data-router-results aria-live="polite"></div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="assets/sorcc.js"></script>
+</body>
+</html>

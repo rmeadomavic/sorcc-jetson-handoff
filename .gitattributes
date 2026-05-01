@@ -1,6 +1,12 @@
-# Force LF for files that run on Linux. CRLF would break shell scripts on Jetson.
+# Force LF for files that run on Linux or are served by GitHub Pages.
+# CRLF would break shell scripts on Jetson and bloat diff output for web assets.
 *.sh text eol=lf
 *.md text eol=lf
 *.svg text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
 .gitignore text eol=lf
 .gitattributes text eol=lf
+*.png binary
+

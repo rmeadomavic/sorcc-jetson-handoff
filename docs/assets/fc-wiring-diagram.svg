@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" font-family="monospace" font-size="14">
+  <title>Jetson UART1 to Pixhawk TELEM2 wiring</title>
+
+  <rect width="800" height="480" fill="#fafafa"></rect>
+
+  
+  <text x="400" y="32" text-anchor="middle" font-size="20" font-weight="bold" fill="#222">Jetson UART1 to Pixhawk TELEM2</text>
+  <text x="400" y="52" text-anchor="middle" font-size="12" fill="#666">3 wires. TX crosses to RX. Common GND.</text>
+
+  
+  <rect x="60" y="100" width="240" height="280" fill="#0d47a1" stroke="#000" stroke-width="2" rx="8"></rect>
+  <text x="180" y="130" text-anchor="middle" font-size="16" font-weight="bold" fill="#fff">Jetson Orin Nano</text>
+  <text x="180" y="150" text-anchor="middle" font-size="12" fill="#bbdefb">40-pin header (3.3V logic)</text>
+
+  
+  <g>
+    
+    <circle cx="290" cy="200" r="8" fill="#000" stroke="#ffd54f" stroke-width="2"></circle>
+    <text x="270" y="205" text-anchor="end" font-size="13" font-weight="bold" fill="#fff">Pin 6 GND</text>
+    
+    <circle cx="290" cy="250" r="8" fill="#1e88e5" stroke="#ffd54f" stroke-width="2"></circle>
+    <text x="270" y="255" text-anchor="end" font-size="13" font-weight="bold" fill="#fff">Pin 8 TX</text>
+    
+    <circle cx="290" cy="300" r="8" fill="#43a047" stroke="#ffd54f" stroke-width="2"></circle>
+    <text x="270" y="305" text-anchor="end" font-size="13" font-weight="bold" fill="#fff">Pin 10 RX</text>
+  </g>
+
+  
+  <rect x="500" y="100" width="240" height="280" fill="#1b5e20" stroke="#000" stroke-width="2" rx="8"></rect>
+  <text x="620" y="130" text-anchor="middle" font-size="16" font-weight="bold" fill="#fff">Pixhawk 6C</text>
+  <text x="620" y="150" text-anchor="middle" font-size="12" fill="#c8e6c9">TELEM2 JST-GH (3.3V logic)</text>
+
+  
+  <g>
+    
+    <circle cx="510" cy="200" r="8" fill="#000" stroke="#ffd54f" stroke-width="2"></circle>
+    <text x="530" y="205" text-anchor="start" font-size="13" font-weight="bold" fill="#fff">Pin 6 GND</text>
+    
+    <circle cx="510" cy="250" r="8" fill="#43a047" stroke="#ffd54f" stroke-width="2"></circle>
+    <text x="530" y="255" text-anchor="start" font-size="13" font-weight="bold" fill="#fff">Pin 2 TX (Pixhawk&#39;s output)</text>
+    
+    <circle cx="510" cy="300" r="8" fill="#1e88e5" stroke="#ffd54f" stroke-width="2"></circle>
+    <text x="530" y="305" text-anchor="start" font-size="13" font-weight="bold" fill="#fff">Pin 3 RX (Pixhawk&#39;s input)</text>
+  </g>
+
+  
+  
+  <line x1="290" y1="200" x2="510" y2="200" stroke="#000" stroke-width="3"></line>
+  <text x="400" y="190" text-anchor="middle" font-size="12" fill="#444">GND</text>
+
+  
+  <path d="M 290 250 Q 400 250 400 300 T 510 300" stroke="#1e88e5" stroke-width="3" fill="none"></path>
+  <text x="400" y="265" text-anchor="middle" font-size="12" fill="#1565c0" font-weight="bold">Jetson TX → Pixhawk RX</text>
+
+  
+  <path d="M 290 300 Q 400 300 400 250 T 510 250" stroke="#43a047" stroke-width="3" fill="none"></path>
+  <text x="400" y="325" text-anchor="middle" font-size="12" fill="#2e7d32" font-weight="bold">Jetson RX ← Pixhawk TX</text>
+
+  
+  <rect x="60" y="410" width="680" height="50" fill="#fff8e1" stroke="#ffd54f" stroke-width="2" rx="4"></rect>
+  <text x="80" y="432" font-size="13" font-weight="bold" fill="#e65100">  IMPORTANT: TX always crosses to RX.</text>
+  <text x="80" y="450" font-size="12" fill="#bf360c">  Wiring TX-to-TX gives no error message — it just silently doesn&#39;t connect.</text>
+</svg>
