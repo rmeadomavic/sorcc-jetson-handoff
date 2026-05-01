@@ -107,7 +107,7 @@ Every subsection page uses this skeleton. Two variants: `.page` for landings (no
   <div class="site-footer__inner">
     <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
     <div class="site-footer__center">UNCLASSIFIED</div>
-    <div class="site-footer__right">CLS 02-26</div>
+    <div class="site-footer__right"><a href="https://github.com/rmeadomavic/sorcc-jetson-handoff">Source on GitHub ›</a></div>
   </div>
 </footer>
 
@@ -382,7 +382,7 @@ End every step page with this. The primary (green) button always points forward.
 1. **No em dashes** (`—`, `&mdash;`) anywhere in body copy. Use middots (`·`, `&middot;`), commas, or sentence breaks. Em dash is banned by the SORCC brand for operational documents.
 2. **"SORCC" is always uppercase**, never "Sorcc" or "sorcc" (the username `sorcc` is fine in code blocks).
 3. **Classification bar is always `UNCLASSIFIED`** unless told otherwise.
-4. **Footer always reads** `SORCC Jetson Handoff · v1.0` / `UNCLASSIFIED` / `CLS 02-26`.
+4. **Footer always reads** `SORCC Jetson Handoff · v1.0` / `UNCLASSIFIED` / `Source on GitHub ›` (back-link to the repo).
 5. **Header meta block** always shows `JETPACK 6.2.1` / `L4T R36.4.X · ORIN NANO 8GB`.
 6. **Tone**: plain operator voice. The audience is a SORCC graduate doing the procedure for the first time, possibly at night, possibly tethered to a phone hotspot. Hand-hold; assume they have never used Linux. Show every command in full.
 7. **Section numbering**: use the prefix in the source (`01-flash-and-update` is "Section 01"). Step numbering within a section follows source filename order (`01-qspi-update.md` is "Step 01").
