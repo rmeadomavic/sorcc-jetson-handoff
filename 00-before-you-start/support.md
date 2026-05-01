@@ -24,27 +24,8 @@ Use the templates in `.github/ISSUE_TEMPLATE/`. Fill them in completely — vagu
 
 ## When NOT to file an issue
 
-- "How do I do X with my Jetson" — this is generic Jetson support, not a SORCC question. Try [NVIDIA's developer forums](https://forums.developer.nvidia.com/c/agx-autonomous-machines/jetson-embedded-systems/70).
-- "Hydra Detect is doing X" — that's a Hydra question. Goes in the Hydra repo, not here.
-- "How do I tune my ArduPilot params" — covered in your SORCC curriculum slides. Re-watch the relevant lecture.
-- "Can you add support for [other Jetson model]" — out of scope. This repo only covers Orin Nano Super 8GB.
-
-## What's in scope
-
-| Topic | In scope here? |
-|---|---|
-| Stock JP 5.1.x → JP 6.x flash + QSPI | Yes |
-| MAXN Super power mode | Yes |
-| Docker + NVIDIA container toolkit setup | Yes |
-| Hydra Detect installation | Yes (install only — operating Hydra goes in the Hydra docs) |
-| Ollama / Open WebUI installation | Yes |
-| ComfyUI installation | Yes |
-| Tailscale on the Jetson | Yes |
-| Wiring a Pixhawk to the Jetson | Yes |
-| ArduPilot parameter tuning | No → SORCC curriculum |
-| Building Hydra from source | No → Hydra repo |
-| AX12 radio config | No → separate repo (coming) |
-| Raspberry Pi (Argus, etc) | No → separate repo (coming) |
+- Generic Jetson questions unrelated to SORCC → try [NVIDIA's developer forums](https://forums.developer.nvidia.com/c/agx-autonomous-machines/jetson-embedded-systems/70).
+- Hydra runtime / behavior questions → file against the Hydra repo, not this one.
 
 ## Out-of-band help
 

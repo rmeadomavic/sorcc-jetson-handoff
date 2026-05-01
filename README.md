@@ -50,13 +50,7 @@ Other Jetsons (Nano 4GB, NX, AGX) might mostly work but aren't tested. The 4GB N
 
 This is a self-serve repo. The first place to look when something breaks is `01-flash-and-update/troubleshooting.md` and the `app-broke.md` issue template.
 
-If you're truly stuck, file an issue using one of the templates in `.github/ISSUE_TEMPLATE/`. Read `00-before-you-start/support.md` first — there's a list of what info to include and what's out of scope.
-
-Stuff that's out of scope here:
-- AX12 / radio setup → separate repo (coming soon)
-- Raspberry Pi (SORCC kit Pi) → separate repo (coming soon)
-- Building Hydra Detect from source, contributing PRs → goes in the Hydra repo
-- ArduPilot parameter tuning → covered by your SORCC curriculum slides
+If you're truly stuck, file an issue using one of the templates in `.github/ISSUE_TEMPLATE/`. Read `00-before-you-start/support.md` first for what info to include.
 
 ## The known traps
 
