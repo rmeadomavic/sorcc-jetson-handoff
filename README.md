@@ -1,4 +1,4 @@
-# SORCC Jetson Keeper
+# SORCC Jetson Handoff
 
 Private guide for SORCC graduates who left class with a Jetson Orin Nano Super 8GB. Walks you from a stock dev kit (JetPack 5.1.x) all the way to JetPack 6.x in MAXN Super power mode, then lets you install whichever pieces of the SORCC "golden image" stack you actually want.
 
