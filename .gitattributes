@@ -1,0 +1,6 @@
+# Force LF for files that run on Linux. CRLF would break shell scripts on Jetson.
+*.sh text eol=lf
+*.md text eol=lf
+*.svg text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf

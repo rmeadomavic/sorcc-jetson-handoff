@@ -1,0 +1,13 @@
+# Local artifacts
+*.log
+*.swp
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Build artifacts (none expected, but just in case)
+*.tar.gz
+*.zip
