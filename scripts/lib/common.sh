@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared helpers for sorcc-jetson-keeper scripts.
+# Shared helpers for sorcc-jetson-handoff scripts.
 # Source this from any install script: . "$(dirname "$0")/../scripts/lib/common.sh"
 
 # Colors (no-op when stdout is not a tty)
