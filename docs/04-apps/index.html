@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Apps — Section 04 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Optional apps for the SORCC Jetson: Hydra Detect, Ollama + Open WebUI, and ComfyUI. Pick what you want." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Section 04 · Apps" data-resume-href="04-apps/index.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Section 04 · Apps</span>
+    <span class="breadcrumb__counter">SECTION 04 OF 04</span>
+  </div>
+</nav>
+
+<main id="main" class="page">
+
+  <p class="doc-eyebrow">Section 04 · 15-60 min each</p>
+  <h1 class="doc-title">Apps</h1>
+  <p class="doc-lede">
+    Three optional apps. Pick what you want. They are independent, so installing one does not
+    require any of the others. Hydra Detect is what you used in class; Ollama gives you a private
+    ChatGPT; ComfyUI does local image generation.
+  </p>
+
+  <div class="section-label">
+    <p class="section-label__text">Pick one</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <div class="card-grid">
+    <a class="card" href="hydra-detect.html">
+      <span class="card__num">App · HD</span>
+      <span class="card__title">Hydra Detect</span>
+      <span class="card__desc">YOLO + ByteTrack object detection, MAVLink alerts, web dashboard, RTSP stream. Built for SORCC platforms.</span>
+      <span class="card__meta"><span>~7 GB disk</span><span>2-3 GB RAM</span></span>
+    </a>
+    <a class="card" href="ollama.html">
+      <span class="card__num">App · OL</span>
+      <span class="card__title">Ollama + Open WebUI</span>
+      <span class="card__desc">Local LLM serving (Llama, Phi, Gemma, etc) plus a ChatGPT-style web UI. No cloud.</span>
+      <span class="card__meta"><span>5-15 GB disk</span><span>4-8 GB RAM</span></span>
+    </a>
+    <a class="card" href="comfyui.html">
+      <span class="card__num">App · CF</span>
+      <span class="card__title">ComfyUI</span>
+      <span class="card__desc">Stable Diffusion / SDXL image generation in a node-graph UI. Tight on 8 GB shared RAM.</span>
+      <span class="card__meta"><span>10+ GB disk</span><span>6-8 GB RAM</span></span>
+    </a>
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">App comparison</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <table class="modern">
+    <thead>
+      <tr><th>App</th><th>Disk</th><th>Memory</th><th>When to install</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Hydra Detect</strong></td>
+        <td>~7 GB</td>
+        <td>2-3 GB</td>
+        <td>If you have a Pixhawk and want what you used in class.</td>
+      </tr>
+      <tr>
+        <td><strong>Ollama + Open WebUI</strong></td>
+        <td>~5-15 GB depending on models</td>
+        <td>4-8 GB during inference</td>
+        <td>If you want a local ChatGPT-style chat with no cloud.</td>
+      </tr>
+      <tr>
+        <td><strong>ComfyUI</strong></td>
+        <td>~10 GB base + 7+ GB per model</td>
+        <td>6-8 GB during generation</td>
+        <td>If you want local AI image generation. Tight on 8 GB shared RAM.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-label">
+    <p class="section-label__text">Before you install anything</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <p>Run preflight first. If it fails, fix the listed issues before continuing. Most blockers live in Section 02.</p>
+
+  <div class="term">
+    <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash scripts/preflight.sh
+</pre>
+  </div>
+
+  <div class="note">
+    <span class="note__label">Memory budget reality check</span>
+    The Jetson Orin Nano Super has 8 GB of shared CPU/GPU RAM. After Linux + the Docker daemon
+    (~1 to 1.5 GB), that's the budget for whatever you're running. You can comfortably run one
+    of these at a time. Trying to run Hydra plus ComfyUI plus a 7B Ollama model concurrently
+    will swap to disk and become unusably slow. Stop containers you're not actively using
+    (<code class="inline">docker stop hydra-detect</code>) and you'll be fine.
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">What "idempotent" means here</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <p>
+    Every <code class="inline">install.sh</code> in this section is safe to re-run. If the app
+    is already installed, the script will detect it, check for updates if relevant, re-apply
+    any config it manages, and not break your existing data. So when in doubt, re-run the
+    installer rather than manually patching.
+  </p>
+
+  <div class="section-label">
+    <p class="section-label__text">Where Docker images live</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <p>
+    By default Docker stores images at <code class="inline">/var/lib/docker/</code>. On a 64 GB
+    SD card with multiple apps installed, you'll fill it up. To move Docker storage to an
+    external SSD, see the NVIDIA Jetson Linux Developer Guide on Docker storage. That's out of
+    scope here, but easy to find.
+  </p>
+
+  <div class="pagenav">
+    <a class="btn" href="../03-hardware/index.html">‹ Hardware</a>
+    <span class="pagenav__spacer"></span>
+    <a class="btn btn--primary" href="hydra-detect.html">Hydra Detect ›</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

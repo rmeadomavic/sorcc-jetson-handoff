@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>First-boot wizard — Section 01 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Walk through the Ubuntu first-boot wizard on a fresh JetPack 6 install: account, Wi-Fi, popups, software updater." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="First-boot wizard · Section 01" data-resume-href="01-flash-and-update/03-first-boot-oobe.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 01</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">First-boot wizard</span>
+    <span class="breadcrumb__counter">STEP 03 OF 04</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-01-qspi,sec-01-flash,sec-01-oobe,sec-01-maxn">
+    <p class="rail__heading">Section 01</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="01-qspi-update.html"><span class="num">01</span><span>QSPI bootloader update</span></a></li>
+      <li><a href="02-flash-jetpack-6.html"><span class="num">02</span><span>Flash JetPack 6.x</span></a></li>
+      <li><a href="03-first-boot-oobe.html"><span class="num">03</span><span>First-boot wizard</span></a></li>
+      <li><a href="04-maxn-super-mode.html"><span class="num">04</span><span>MAXN Super power mode</span></a></li>
+      <li><a href="troubleshooting.html"><span class="num">!!</span><span>Troubleshooting</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 4 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 01 · Step 03 · ~30 min</p>
+    <h1 class="doc-title">First-boot wizard</h1>
+    <p class="doc-lede">
+      Ubuntu's out-of-box experience wizard runs the first time you boot any fresh JetPack image. It is a series of screens
+      asking about language, network, account, and so on. None of it is hard, but a couple of choices matter.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Walk through the wizard</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <h3>License agreement</h3>
+    <p>Click <strong>I Accept</strong>.</p>
+
+    <h3>Language</h3>
+    <p><strong>English (United States)</strong>, or whatever you actually want. Click <strong>Continue</strong>.</p>
+
+    <h3>Keyboard layout</h3>
+    <p><strong>English (US)</strong>, match your physical keyboard. Click <strong>Continue</strong>.</p>
+
+    <h3>Wi-Fi</h3>
+    <p>
+      Pick your network and enter the password. <strong>Required.</strong> The Jetson needs internet for the post-setup updates.
+      If you have Ethernet plugged in, you can pick <strong>I don't want to connect to a Wi-Fi network right now</strong> and use Ethernet instead.
+    </p>
+
+    <h3>Time zone</h3>
+    <p>Pick yours. Click <strong>Continue</strong>.</p>
+
+    <h3>User account</h3>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Field</th><th>What to put</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Your name</td><td><code class="inline">sorcc</code></td></tr>
+        <tr><td>Your computer's name</td><td><code class="inline">jetson</code> (or whatever; this is the hostname)</td></tr>
+        <tr><td>Pick a username</td><td><code class="inline">sorcc</code></td></tr>
+        <tr><td>Choose a password</td><td><code class="inline">sorcc</code></td></tr>
+        <tr><td>Confirm password</td><td><code class="inline">sorcc</code></td></tr>
+        <tr><td>Log in automatically</td><td><strong>Check this box</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>Click <strong>Continue</strong>.</p>
+
+    <div class="note">
+      <span class="note__label">Why sorcc / sorcc?</span>
+      Matches the convention from class. Everything in <code class="inline">04-apps/</code> assumes the username is <code class="inline">sorcc</code>. If you use something else, you will need to mentally substitute throughout. For the field: once you are operating the Jetson on a real platform, change to a stronger password with <code class="inline">passwd</code>. The default is fine for bench and lab.
+    </div>
+
+    <h3>Partition size</h3>
+    <p>Accept the default (use the whole SD card). Click <strong>Continue</strong>.</p>
+
+    <h3>Chromium browser</h3>
+    <p>Click <strong>Install</strong>. You will need a browser later to access Hydra's web dashboard. Wait for it to finish, then click <strong>Close</strong>.</p>
+
+    <p>The Jetson will apply the settings and reboot automatically. <strong>Wait through this.</strong> It can take 5 minutes.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Post-reboot popups</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>After the reboot you land on the Ubuntu desktop. A few popups will appear over the next minute. Handle them in this order.</p>
+
+    <h3>Online accounts</h3>
+    <p>Click <strong>Skip</strong>. You do not need a Google or Microsoft account for this.</p>
+
+    <h3>Ubuntu Pro</h3>
+    <p>Click <strong>Skip</strong>. Ubuntu Pro is a paid Canonical thing you do not need.</p>
+
+    <h3>Send system info to Canonical</h3>
+    <p>Pick <strong>No, don't send system info</strong>. Click <strong>Next</strong>.</p>
+
+    <h3>Location services</h3>
+
+    <div class="trap">
+      <div class="trap__head">
+        <span class="trap__num">Heads up</span>
+        <span class="trap__title">Leave Location Services OFF.</span>
+      </div>
+      <div class="trap__body">
+        <p>
+          The Jetson does not need OS-level location services. If you are using Hydra Detect, it gets GPS from the flight
+          controller via MAVLink, which is far better than the Jetson's nonexistent GPS hardware. Ubuntu's location services
+          would just sit there making background network calls for nothing.
+        </p>
+      </div>
+    </div>
+
+    <p>Click <strong>Next</strong>.</p>
+
+    <h3>Done</h3>
+    <p>Click <strong>Done</strong>.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">System updater popup</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      Within a couple of minutes, a <strong>Software Updater</strong> window pops up. Click <strong>Install Now</strong>,
+      enter your password (<code class="inline">sorcc</code>), and let it run.
+    </p>
+
+    <div class="note">
+      <span class="note__label">Heads up</span>
+      This takes 20 to 30 minutes. Get coffee. Do not power off.
+    </div>
+
+    <p>When it finishes, click <strong>Restart Now</strong>.</p>
+
+    <div class="trap">
+      <div class="trap__head">
+        <span class="trap__num">Trap</span>
+        <span class="trap__title">Do NOT power off during the post-update reboot.</span>
+      </div>
+      <div class="trap__body">
+        <p>
+          During restart you will see an NVIDIA boot screen with an update progress bar. The Jetson is applying kernel and
+          firmware updates. Cutting power here can leave the system in a bad state. Wait for the desktop to come back up.
+        </p>
+      </div>
+    </div>
+
+    <p>When the desktop comes back up, you are ready for <a href="04-maxn-super-mode.html">Step 04</a>.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Sanity check</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>Open a terminal (<strong>Ctrl+Alt+T</strong>) and run:</p>
+
+    <div class="term">
+      <div class="term__head">
+        <span class="term__label">Shell · sorcc@jetson</span>
+        <button class="term__copy">Copy</button>
+      </div>
+<pre class="term__body"><span class="prompt">$ </span>cat /etc/nv_tegra_release
+<span class="comment"># Expected first line: # R36 (release), REVISION: 4.x, GCID: ..., ...</span>
+
+<span class="prompt">$ </span>docker --version
+<span class="comment"># Expected: Docker version 27.x or newer</span>
+
+<span class="prompt">$ </span>df -h /
+<span class="comment"># Should show your SD card with most of it as free space.</span>
+</pre>
+    </div>
+
+    <p>If you see <code class="inline">R36</code>, JetPack 6 is alive. You are good. Onwards.</p>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-01-oobe" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="02-flash-jetpack-6.html">‹ Flash JetPack 6.x</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="04-maxn-super-mode.html">MAXN Super power mode ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

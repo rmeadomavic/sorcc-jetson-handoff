@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>QSPI bootloader update — Section 01 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Update the Jetson Orin Nano QSPI bootloader from a JetPack 5.1.3 SD card so the board can boot JetPack 6.x." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="QSPI bootloader update · Section 01" data-resume-href="01-flash-and-update/01-qspi-update.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 01</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">QSPI bootloader update</span>
+    <span class="breadcrumb__counter">STEP 01 OF 04</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-01-qspi,sec-01-flash,sec-01-oobe,sec-01-maxn">
+    <p class="rail__heading">Section 01</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="01-qspi-update.html"><span class="num">01</span><span>QSPI bootloader update</span></a></li>
+      <li><a href="02-flash-jetpack-6.html"><span class="num">02</span><span>Flash JetPack 6.x</span></a></li>
+      <li><a href="03-first-boot-oobe.html"><span class="num">03</span><span>First-boot wizard</span></a></li>
+      <li><a href="04-maxn-super-mode.html"><span class="num">04</span><span>MAXN Super power mode</span></a></li>
+      <li><a href="troubleshooting.html"><span class="num">!!</span><span>Troubleshooting</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 4 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 01 · Step 01 · ~30 min</p>
+    <h1 class="doc-title">QSPI bootloader update</h1>
+    <p class="doc-lede">
+      Brand-new Jetson Orin Nano dev kits ship with old QSPI firmware that physically cannot boot a JetPack 6.x SD card.
+      You boot a JetPack 5.1.3 SD card first, run an apt package that flashes new QSPI firmware during reboot, then
+      swap to your JP 6.x card. Read this whole page before starting. The two traps below are the things that fail most often.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Read these first · two known traps</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="trap-grid trap-grid--2">
+      <div class="trap">
+        <div class="trap__head">
+          <span class="trap__num">Trap 01</span>
+          <span class="trap__title">Lowercase L, not number 1.</span>
+        </div>
+        <div class="trap__body">
+          <p>
+            The package name is <code class="inline">nvidia-l4t-jetson-orin-nano-qspi-updater</code>. That is a lowercase
+            <strong>L</strong>, not a <strong>number 1</strong>. If you mistype it, apt says "Unable to locate package" and
+            you will spend 20 minutes wondering why. Use tab completion: type <code class="inline">nvidia-l4t-</code> and
+            press Tab.
+          </p>
+        </div>
+      </div>
+      <div class="trap">
+        <div class="trap__head">
+          <span class="trap__num">Trap 02</span>
+          <span class="trap__title">Single-shot install per SD card.</span>
+        </div>
+        <div class="trap__body">
+          <p>
+            The QSPI updater only fires its post-install hook the <em>first</em> time it is installed on a given SD card.
+            If you reuse a JP 5.1.3 card on a second Jetson, you must add <code class="inline">--reinstall</code> or it
+            will be a silent no-op and the QSPI on the new board stays untouched.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">What you need</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li>The Jetson, monitor, keyboard, USB-C power supply (see <a href="../00-before-you-start/index.html">Section 00</a>)</li>
+      <li>A microSD card (the temporary one, 32 GB+) flashed with <strong>JetPack 5.1.3</strong></li>
+      <li>Internet for the Jetson (Wi-Fi or Ethernet)</li>
+    </ul>
+
+    <h3>Get the JetPack 5.1.3 image</h3>
+    <ol>
+      <li>Go to <a href="https://developer.nvidia.com/embedded/downloads">developer.nvidia.com/embedded/downloads</a>.</li>
+      <li>Search for <strong>"JetPack 5.1.3 SD Card Image"</strong>. There is an Orin Nano Developer Kit version. Download it.</li>
+      <li>The file ends in <code class="inline">.img.xz</code>. Etcher can flash <code class="inline">.img.xz</code> directly. No need to extract.</li>
+      <li>Open Etcher, Flash from file, pick the <code class="inline">.img.xz</code>, select your microSD card, Flash. Takes 10 to 15 minutes.</li>
+    </ol>
+
+    <div class="section-label">
+      <p class="section-label__text">The procedure</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">01</div>
+      <div class="step__body">
+        <h3>Boot the JP 5.1.3 card.</h3>
+        <ol>
+          <li>Insert the JP 5.1.3 microSD into the Jetson. The slot is on the underside of the carrier board.</li>
+          <li>Plug in monitor, keyboard, USB-C power. The board boots.</li>
+          <li>Walk through the Ubuntu first-boot wizard. <strong>Use <code class="inline">sorcc</code> for username and <code class="inline">sorcc</code> for password.</strong> This matches what Step 02 will use later, which keeps your muscle memory simple.</li>
+          <li>Wait for the desktop to load.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">02</div>
+      <div class="step__body">
+        <h3>Install the QSPI updater.</h3>
+        <p>Open a terminal with <strong>Ctrl+Alt+T</strong>.</p>
+        <div class="term">
+          <div class="term__head">
+            <span class="term__label">Shell · sorcc@jetson</span>
+            <button class="term__copy">Copy</button>
+          </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo apt-get update
+<span class="prompt">$ </span>sudo apt-get install nvidia-l4t-jetson-orin-nano-qspi-updater
+<span class="comment"># Triple-check the package name. l4t is lowercase L + 4 + lowercase T.</span>
+</pre>
+        </div>
+        <p>If apt says "Unable to locate package":</p>
+        <ul>
+          <li>Did you run <code class="inline">sudo apt-get update</code> first? Required.</li>
+          <li>Are you on Wi-Fi that has a captive portal (hotel, coffee shop)? Switch to a hotspot or home network.</li>
+          <li>Is your package name actually correct? Type <code class="inline">apt search qspi-updater</code> to verify.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">03</div>
+      <div class="step__body">
+        <h3>Reboot.</h3>
+        <div class="term">
+          <div class="term__head">
+            <span class="term__label">Shell · sorcc@jetson</span>
+            <button class="term__copy">Copy</button>
+          </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo reboot
+</pre>
+        </div>
+        <p>
+          The Jetson reboots, then starts flashing the QSPI firmware. <strong>The screen goes blank, or you see a UEFI prompt,
+          and the board halts.</strong> This is exactly what is supposed to happen. Do not touch anything.
+        </p>
+        <p>Wait at least 60 seconds after the screen goes blank.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">04</div>
+      <div class="step__body">
+        <h3>Power down.</h3>
+        <p>
+          Unplug the USB-C power supply. The board is now done with the QSPI update. You can remove the JP 5.1.3 SD card
+          and continue to Step 02.
+        </p>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Verifying the update worked</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      You cannot easily verify QSPI from JP 5.1.3. The whole point is that the version on the board does not match what
+      is on the card. The real test: does the Jetson boot the JP 6.x card after the swap? If yes, the QSPI update worked.
+      If no, see <a href="troubleshooting.html">troubleshooting</a>.
+    </p>
+
+    <p>After you boot JetPack 6.x successfully:</p>
+
+    <div class="term">
+      <div class="term__head">
+        <span class="term__label">Shell · sorcc@jetson</span>
+        <button class="term__copy">Copy</button>
+      </div>
+<pre class="term__body"><span class="prompt">$ </span>cat /etc/nv_tegra_release
+<span class="comment"># Expected first line: # R36 (release), REVISION: 4.x, ...</span>
+</pre>
+    </div>
+
+    <p>If you see <code class="inline">R36</code>, the QSPI is current.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Local troubleshooting</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <h3>Board does NOT halt, reboots back into JP 5.1.3 desktop</h3>
+    <p>The post-install hook did not fire. Re-run with <code class="inline">--reinstall</code>:</p>
+    <div class="term">
+      <div class="term__head">
+        <span class="term__label">Shell · sorcc@jetson</span>
+        <button class="term__copy">Copy</button>
+      </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo apt-get install --reinstall nvidia-l4t-jetson-orin-nano-qspi-updater
+<span class="prompt">$ </span>sudo reboot
+</pre>
+    </div>
+
+    <h3>Board halts, but the JP 6.x card still will not boot afterward</h3>
+    <p>This is the case that bit one student in CLS 8. QSPI looked successful but JP 6 still failed. Try in order:</p>
+    <ol>
+      <li><strong>Re-flash the JP 6.x SD card</strong> with Etcher. Use verify enabled. A bad flash is more common than a bad QSPI update.</li>
+      <li>Try a <strong>different SD card</strong>. UHS-I or faster, 64 GB+. Cheap or counterfeit cards fail in weird ways.</li>
+      <li><strong>Re-do the QSPI step with <code class="inline">--reinstall</code></strong> even though the first run looked successful. Costs 10 minutes, sometimes fixes it.</li>
+      <li>If you have done all three: file an issue with the <code class="inline">flash-broke.md</code> template. Include the output of <code class="inline">dmesg</code> from a JP 5.1.3 boot.</li>
+    </ol>
+
+    <h3>The board boots straight into JP 6.x without halting</h3>
+    <p>Lucky you. This Jetson already had a recent QSPI. Skip ahead to <a href="02-flash-jetpack-6.html">Step 02</a>.</p>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-01-qspi" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="index.html">‹ Section overview</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="02-flash-jetpack-6.html">Flash JetPack 6.x ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

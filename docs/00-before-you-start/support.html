@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Support — Section 00 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="When to file an issue, when not to, and how to get out-of-band help for SORCC Jetson problems." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Support · Section 00" data-resume-href="00-before-you-start/support.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 00</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Support</span>
+    <span class="breadcrumb__counter">DOC 3 OF 3</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="">
+    <p class="rail__heading">Section 00</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="what-you-have.html"><span class="num">01</span><span>What you have</span></a></li>
+      <li><a href="what-you-need.html"><span class="num">02</span><span>What you need</span></a></li>
+      <li><a href="support.html"><span class="num">03</span><span>Support</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 0 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 00 · Doc 03 · ~1 min</p>
+    <h1 class="doc-title">Support</h1>
+    <p class="doc-lede">
+      This repo is self-serve. The docs here exist so you can solve your own problems
+      without having to wait for help.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Before you ask for help</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>Run through this checklist first. 90% of "it doesn't work" gets fixed at one of these steps.</p>
+
+    <ol>
+      <li><strong>Did you read the relevant doc end-to-end?</strong> Skimming misses the warning callouts. The lowercase-L typo trap in QSPI is in a callout, not the body text.</li>
+      <li><strong>Did <code class="inline">bash scripts/preflight.sh</code> pass?</strong> It tells you exactly which step you're stuck on. Run it before reading anything else.</li>
+      <li><strong>Did you check <code class="inline">01-flash-and-update/troubleshooting.md</code>?</strong> Every failure mode someone has hit lives there.</li>
+      <li><strong>Did you Google the exact error message in quotes?</strong> NVIDIA's developer forums and the JetsonHacks site cover most JetPack issues better than anyone.</li>
+      <li><strong>Did you try a clean reflash?</strong> Bad SD card flashes are more common than you'd think. Etcher with verify enabled, or use a different card.</li>
+    </ol>
+
+    <div class="section-label">
+      <p class="section-label__text">When to file an issue</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>File an issue when:</p>
+    <ul>
+      <li>You followed a doc exactly and the result doesn't match what the doc says</li>
+      <li>You found a step that's wrong, outdated, or missing</li>
+      <li>A command in a script fails and the error doesn't match anything in troubleshooting</li>
+    </ul>
+    <p>Use the templates in <code class="inline">.github/ISSUE_TEMPLATE/</code>. Fill them in completely. Vague issues get vague answers.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">When NOT to file an issue</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li>Generic Jetson questions unrelated to SORCC, try <a href="https://forums.developer.nvidia.com/c/agx-autonomous-machines/jetson-embedded-systems/70">NVIDIA's developer forums</a>.</li>
+      <li>Hydra runtime / behavior questions, file against the Hydra repo, not this one.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Out-of-band help</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>If your Jetson is bricked and you need direct support, reach out through the channel you were given at the end of class. Include:</p>
+
+    <ul>
+      <li>Which SORCC class you attended (e.g. "CLS 8 student")</li>
+      <li>What step in the docs you were on</li>
+      <li>The exact error message or symptom</li>
+      <li>Output of <code class="inline">bash scripts/preflight.sh</code></li>
+    </ul>
+
+    <p>For non-urgent feature requests or doc improvements, file an issue on the repo.</p>
+
+    <div class="pagenav">
+      <a class="btn" href="what-you-need.html">‹ What you need</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="../01-flash-and-update/index.html">Section 01 · Flash &amp; update ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

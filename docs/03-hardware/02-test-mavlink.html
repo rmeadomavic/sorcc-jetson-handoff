@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Test MAVLink — Section 03 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Confirm the Pixhawk-to-Jetson serial link works using MAVProxy." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Test MAVLink · Section 03" data-resume-href="03-hardware/02-test-mavlink.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 03</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Test MAVLink</span>
+    <span class="breadcrumb__counter">STEP 2 OF 2</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-03-wiring,sec-03-mavlink">
+    <p class="rail__heading">Section 03</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="01-fc-wiring.html"><span class="num">01</span><span>FC wiring</span></a></li>
+      <li><a href="02-test-mavlink.html"><span class="num">02</span><span>Test MAVLink</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 2 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 03 · Step 02 · ~10 min</p>
+    <h1 class="doc-title">Test MAVLink.</h1>
+    <p class="doc-lede">
+      You wired the Pixhawk to the Jetson per Step 01. Time to confirm the link works before you
+      put any software in front of it.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">What you need</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li>Pixhawk wired to Jetson per <a href="01-fc-wiring.html">Step 01</a></li>
+      <li>Pixhawk powered (battery, or USB if bench testing, never both)</li>
+      <li>The user <code class="inline">sorcc</code> already in the <code class="inline">dialout</code> group (handled by <code class="inline">02-base-system/01-base-bootstrap.sh</code>)</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Step 1 · Confirm the device exists</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="comment"># For USB-C bench connection:</span>
+<span class="prompt">$ </span>ls /dev/ttyACM*
+<span class="comment"># Expect: /dev/ttyACM0</span>
+
+<span class="comment"># For TELEM2 UART (40-pin header):</span>
+<span class="prompt">$ </span>ls /dev/ttyTHS*
+<span class="comment"># Expect: /dev/ttyTHS1</span>
+</pre>
+    </div>
+
+    <p>If neither shows up:</p>
+
+    <ul>
+      <li><strong>USB-C:</strong> try a different cable. Some USB-C cables are charge-only.</li>
+      <li><strong>UART:</strong> re-check pin 1 orientation. Re-check TX/RX are not swapped. Confirm the Pixhawk is actually powered.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Step 2 · Install MAVProxy</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo apt-get update
+<span class="prompt">$ </span>sudo apt-get install -y python3-pip python3-dev libxml2-dev libxslt-dev
+<span class="prompt">$ </span>pip3 install --user MAVProxy
+</pre>
+    </div>
+
+    <p>
+      <code class="inline">mavproxy.py</code> will end up at
+      <code class="inline">~/.local/bin/mavproxy.py</code>, already on PATH on JetPack 6.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Step 3 · Connect</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>Pick the line that matches your wiring:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="comment"># USB-C connection:</span>
+<span class="prompt">$ </span>mavproxy.py --master=/dev/ttyACM0 --baudrate=115200
+
+<span class="comment"># TELEM2 UART connection:</span>
+<span class="prompt">$ </span>mavproxy.py --master=/dev/ttyTHS1 --baudrate=921600
+</pre>
+    </div>
+
+    <p>Within ~2 seconds you should see:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Output</span><button class="term__copy">Copy</button></div>
+<pre class="term__body">Connect /dev/ttyACM0 source_system=255
+Log Directory:
+Telemetry log: mav.tlog
+Waiting for heartbeat from /dev/ttyACM0
+MAV&gt; Detected vehicle 1:1 on link 0
+online system 1
+APM: ChibiOS: ...
+APM: ArduRover V4.x.x
+APM: ...
+GPS lock at 0 meters    <span class="comment">(or "no GPS" if indoors)</span>
+Mode MANUAL
+</pre>
+    </div>
+
+    <p>
+      If you see the <code class="inline">APM:</code> lines, the link is up. Hit
+      <strong>Ctrl+D</strong> then <code class="inline">exit</code> to quit.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Common failure modes</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <h3>"Waiting for heartbeat from..." forever</h3>
+    <ul>
+      <li>TX/RX swapped on TELEM2 UART. Most common. Swap pin 8 and pin 10.</li>
+      <li>Pixhawk not powered, or in bootloader mode (boot it normally with battery or USB-only).</li>
+      <li>Wrong baud rate. USB is 115200, TELEM2 is 921600.</li>
+      <li><code class="inline">SERIAL2_PROTOCOL</code> on the Pixhawk is not set to MAVLink2 (<code class="inline">= 2</code>). Should already be set from class. If not: see SORCC curriculum or the Pixhawk doc in the Hydra repo.</li>
+    </ul>
+
+    <h3>"Permission denied: '/dev/ttyACM0'"</h3>
+    <p>You are not in the <code class="inline">dialout</code> group. Either:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo usermod -aG dialout sorcc
+<span class="comment"># Log out and back in, or:</span>
+<span class="prompt">$ </span>newgrp dialout
+</pre>
+    </div>
+
+    <p>
+      Or re-run <code class="inline">02-base-system/01-base-bootstrap.sh</code> which adds you
+      automatically.
+    </p>
+
+    <h3>Heartbeat works briefly, then drops</h3>
+    <ul>
+      <li>Loose dupont connector. Try wiggling the wires while watching the output.</li>
+      <li>Bad ground (pin 6 not actually connected). Always wire GND.</li>
+      <li>USB cable is marginal. Try a known-good cable.</li>
+    </ul>
+
+    <h3><code class="inline">mavproxy.py: command not found</code></h3>
+    <p>
+      <code class="inline">pip3 install --user</code> puts binaries in
+      <code class="inline">~/.local/bin</code>. On most JetPack 6 setups this is on PATH
+      automatically; if not:
+    </p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>echo 'export PATH="$HOME/.local/bin:$PATH"' &gt;&gt; ~/.bashrc
+<span class="prompt">$ </span>source ~/.bashrc
+</pre>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Once MAVLink works</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      You are ready for <a href="../04-apps/index.html">Section 04 · Apps</a> and the Hydra Detect
+      install, which uses this same connection.
+    </p>
+
+    <p>
+      If you only want the Jetson for compute (Ollama or ComfyUI without a vehicle), you do not
+      need any of this. Skip to <a href="../04-apps/index.html">Section 04</a>.
+    </p>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-03-mavlink" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="01-fc-wiring.html">‹ Step 01 · Wire the flight controller</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="../04-apps/index.html">Section 04 · Apps ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

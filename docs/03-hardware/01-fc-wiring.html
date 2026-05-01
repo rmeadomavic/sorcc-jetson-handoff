@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Wire the flight controller — Section 03 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Wire a Pixhawk flight controller to the Jetson via USB-C or the 40-pin TELEM2 UART path." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Wire the flight controller · Section 03" data-resume-href="03-hardware/01-fc-wiring.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 03</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Wire the flight controller</span>
+    <span class="breadcrumb__counter">STEP 1 OF 2</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-03-wiring,sec-03-mavlink">
+    <p class="rail__heading">Section 03</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="01-fc-wiring.html"><span class="num">01</span><span>FC wiring</span></a></li>
+      <li><a href="02-test-mavlink.html"><span class="num">02</span><span>Test MAVLink</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 2 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 03 · Step 01 · ~20 min</p>
+    <h1 class="doc-title">Wire the flight controller.</h1>
+    <p class="doc-lede">
+      If your platform from class was a quad, fixed-wing, rover, or boat, your Jetson talks to a
+      Pixhawk flight controller over a serial connection. This page covers the wiring. The MAVLink
+      test is on the next page. The Pixhawk's own ArduPilot parameters were configured in class
+      and are not covered here.
+    </p>
+
+    <div class="note">
+      <span class="note__label">Skip</span>
+      Skip this whole section if you do not have a Pixhawk, or if your Jetson is purely a compute
+      payload (Ollama, ComfyUI, no vehicle).
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Three wires, that's it</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      For TELEM2 UART you wire three jumpers from the Jetson's 40-pin GPIO header to the Pixhawk's
+      TELEM2 port. The other three pins of the JST-GH cable are unused for this. The diagram below
+      shows the full picture.
+    </p>
+
+    <div class="diagram">
+      <object data="../assets/fc-wiring-diagram.svg" type="image/svg+xml" aria-label="Pixhawk to Jetson TELEM2 UART wiring diagram"></object>
+    </div>
+
+    <div class="trap">
+      <div class="trap__head">
+        <span class="trap__num">Trap</span>
+        <span class="trap__title">Never power Pixhawk from USB and battery at the same time.</span>
+      </div>
+      <div class="trap__body">
+        <p>
+          Both paths can damage the Pixhawk. Do NOT power the Pixhawk from both USB and the
+          vehicle battery at the same time. USB power backfeeds the Pixhawk's voltage rails and
+          can damage them. For bench work: power the Pixhawk <strong>only</strong> via USB
+          (motors will not spin without battery, which is what you want). For flight: battery
+          only, no USB.
+        </p>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Two connection options</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>You will use one of these depending on the situation:</p>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Option</th><th>When to use</th><th>Connector</th><th>Speed</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>USB-C</strong></td>
+          <td>Bench testing, fault-finding, no flight</td>
+          <td>USB-C cable, Pixhawk to Jetson</td>
+          <td>115200 baud (virtual serial)</td>
+        </tr>
+        <tr>
+          <td><strong>TELEM2 UART</strong></td>
+          <td>Field deployment, on-vehicle</td>
+          <td>6-pin JST-GH cable + 3 dupont jumpers</td>
+          <td>921600 baud</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <strong>USB-C is the easy path.</strong> Plug a USB-C cable from the Pixhawk to a Jetson USB
+      port, the Pixhawk shows up as <code class="inline">/dev/ttyACM0</code>. Done. Use this for
+      first-time testing.
+    </p>
+
+    <p>
+      <strong>TELEM2 UART is the field path.</strong> You cannot keep a USB-C cable dangling on a
+      vehicle, so for real flights or runs you wire 3 jumpers from the Jetson's 40-pin GPIO header
+      to the Pixhawk's TELEM2 port. This is what the rest of this page covers.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">TELEM2 UART pin map</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Jetson 40-pin header</th><th>Pixhawk TELEM2 (JST-GH 6-pin)</th><th>What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Pin 8 (UART1 TX)</strong></td>
+          <td>Pin 3 (RX, Pixhawk's input)</td>
+          <td>Jetson talks to Pixhawk</td>
+        </tr>
+        <tr>
+          <td><strong>Pin 10 (UART1 RX)</strong></td>
+          <td>Pin 2 (TX, Pixhawk's output)</td>
+          <td>Pixhawk talks to Jetson</td>
+        </tr>
+        <tr>
+          <td><strong>Pin 6 (GND)</strong></td>
+          <td>Pin 6 (GND)</td>
+          <td>Common ground (required)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <strong>Important:</strong> TX always crosses to RX. Jetson TX (pin 8) goes to Pixhawk RX
+      (pin 3). If you wire TX-to-TX, nothing works and there is no error message. It just
+      silently does not connect.
+    </p>
+
+    <p>
+      The Pixhawk side labels (TX, RX) are from the <strong>Pixhawk's</strong> perspective. So
+      Pixhawk's "TX" is its output, which goes to your input (Jetson RX). Easy to flip if you read
+      them as Jetson-side labels.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Logic levels, both 3.3V</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="note">
+      <span class="note__label">Note</span>
+      The Jetson 40-pin GPIO header runs at <strong>3.3V logic</strong>. The Pixhawk TELEM2 also
+      runs at <strong>3.3V logic</strong>. They wire directly together with <strong>no level
+      shifter required</strong>. You may see other docs claiming the Jetson UART is 1.8V; that is
+      a different UART (the debug UART), not the one on the 40-pin header. The pin 8/10 UART that
+      this page uses is 3.3V and tested working with no level shifter (heartbeat received in under
+      2 seconds, multiple field sessions). If you wire it and get nothing, the cause is almost
+      always TX/RX swapped or a missing GND, not a logic-level mismatch.
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Cable options</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>You have a few choices for the actual physical cable:</p>
+
+    <ol>
+      <li>
+        <strong>The cable that came with your Pixhawk.</strong> Most Pixhawk 6C kits ship with a
+        6-pin JST-GH-to-loose-pin "telemetry" cable. Trim and strip the 3 wires you need (TX, RX,
+        GND), terminate them with female dupont connectors, plug them onto the Jetson header.
+      </li>
+      <li>
+        <strong>JST-GH-to-Dupont harness from the Holybro store.</strong> Pre-terminated,
+        prettiest option.
+      </li>
+      <li>
+        <strong>Build your own</strong> with a JST-GH crimp kit if you have one.
+      </li>
+    </ol>
+
+    <p>
+      Do not try to solder directly to the Jetson header pins. The pins are short and the carrier
+      board is delicate.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Identifying the right pins</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      The Jetson 40-pin header is right next to the heatsink. Pin 1 is at the corner closest to
+      the SD card slot, marked with a tiny silkscreen "1" or a square pad (the rest are round).
+    </p>
+
+    <p>Counting from pin 1:</p>
+
+    <ul>
+      <li>Pin 6 = GND (3rd row, side closest to the board edge)</li>
+      <li>Pin 8 = UART1 TX (4th row, side closest to the board edge)</li>
+      <li>Pin 10 = UART1 RX (5th row, side closest to the board edge)</li>
+    </ul>
+
+    <p>
+      If you put pin 1 in the wrong corner, you will wire to pins 33, 35, 37 by accident. If
+      MAVLink does not connect, double-check pin 1 orientation before debugging anything else.
+    </p>
+
+    <div class="diagram">
+      <object data="../assets/jetson-40pin-pinout.svg" type="image/svg+xml" aria-label="Jetson Orin Nano 40-pin header pinout"></object>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Once it's wired</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      Continue to <a href="02-test-mavlink.html">Step 02 · Test MAVLink</a> to confirm the
+      connection works.
+    </p>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-03-wiring" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="index.html">‹ Section 03 overview</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="02-test-mavlink.html">Step 02 · Test MAVLink ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

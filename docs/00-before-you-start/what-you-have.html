@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>What you have — Section 00 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Anatomy of the Jetson Orin Nano Super dev kit: carrier board, compute module, ports, and accessories." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="What you have · Section 00" data-resume-href="00-before-you-start/what-you-have.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 00</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">What you have</span>
+    <span class="breadcrumb__counter">DOC 1 OF 3</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="">
+    <p class="rail__heading">Section 00</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="what-you-have.html"><span class="num">01</span><span>What you have</span></a></li>
+      <li><a href="what-you-need.html"><span class="num">02</span><span>What you need</span></a></li>
+      <li><a href="support.html"><span class="num">03</span><span>Support</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 0 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 00 · Doc 01 · ~2 min</p>
+    <h1 class="doc-title">What you have</h1>
+    <p class="doc-lede">
+      You left SORCC with an <strong>NVIDIA Jetson Orin Nano Super 8GB</strong> dev kit. This page
+      is a quick anatomy lesson so the rest of the docs make sense.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">The board itself</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>The dev kit is two parts:</p>
+    <ul>
+      <li><strong>The carrier board</strong>, the green PCB with all the ports. This is what you plug things into.</li>
+      <li><strong>The compute module</strong>, the small board piggybacked on top with the heatsink. This is the actual Jetson. Don't unscrew it unless you have a reason.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Ports you'll use</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>Looking at the carrier board with the big heatsink facing up:</p>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Port</th><th>Used for</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>microSD slot</strong></td><td>Underneath the carrier board, on the bottom. This is where your operating system lives.</td></tr>
+        <tr><td><strong>USB-C (power)</strong></td><td>Power input. The official 5V/3A USB-C adapter goes here.</td></tr>
+        <tr><td><strong>USB-C (data, only on some kits)</strong></td><td>Some boards have a second USB-C for data, used for flashing in recovery mode.</td></tr>
+        <tr><td><strong>HDMI / DisplayPort</strong></td><td>Plug a monitor here for the first-boot wizard.</td></tr>
+        <tr><td><strong>USB-A x4</strong></td><td>Keyboard, mouse, USB camera, USB-to-flight-controller cable.</td></tr>
+        <tr><td><strong>Ethernet (RJ-45)</strong></td><td>Network. Use this for the QSPI step if your Wi-Fi is iffy.</td></tr>
+        <tr><td><strong>40-pin GPIO header</strong></td><td>The big header along one edge. This is where you wire a flight controller. See <code class="inline">03-hardware/</code>.</td></tr>
+        <tr><td><strong>Power button + recovery button</strong></td><td>Two small buttons on the side. You will rarely touch these.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">
+      <p class="section-label__text">What you also got from class</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li><strong>microSD card</strong> with the SORCC golden image (already flashed)</li>
+      <li><strong>Power supply</strong> (5V / 3A USB-C, do not substitute a phone charger, it'll undervolt)</li>
+      <li><strong>USB camera</strong> (Logitech C270 or C920) for Hydra detection</li>
+      <li>(Maybe) <strong>Pixhawk 6C flight controller + telemetry cable</strong> if your platform was a quad / boat / rover</li>
+      <li>(Maybe) <strong>NooElec NESDR Smart v5 RTL-SDR dongle</strong> for RF homing experiments</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">What "Super" means</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      The Orin Nano Super is the hardware refresh that NVIDIA released in late 2024. It's the same
+      compute module as the original Orin Nano but unlocked to <strong>25W (MAXN Super)</strong>
+      instead of capped at 15W. The original boards can be upgraded to Super capability via a
+      JetPack 6.1+ flash, which is what this repo walks you through.
+    </p>
+
+    <div class="note">
+      <span class="note__label">Heads up</span>
+      If you're not sure whether you have the Super hardware, it doesn't matter. The flash process
+      is the same either way. Once you're on JetPack 6.x, you can switch to MAXN Super power mode
+      and the board will use it if it's capable.
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Where to find your serial number</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      If you ever need to RMA the board (NVIDIA support, warranty), the serial is on a sticker on
+      the underside of the carrier board. Take a photo of it before you put the board in a case.
+    </p>
+
+    <div class="pagenav">
+      <a class="btn" href="index.html">‹ Overview</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="what-you-need.html">What you need ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

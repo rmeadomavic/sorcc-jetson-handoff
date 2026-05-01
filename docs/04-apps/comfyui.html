@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ComfyUI — Section 04 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Install ComfyUI on the Jetson for local Stable Diffusion / SDXL image generation in a node-graph UI." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="ComfyUI · Section 04" data-resume-href="04-apps/comfyui.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 04</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">ComfyUI</span>
+    <span class="breadcrumb__counter">APP 3 OF 3</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-04-hydra,sec-04-ollama,sec-04-comfyui">
+    <p class="rail__heading">Section 04</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="hydra-detect.html"><span class="num">HD</span><span>Hydra Detect</span></a></li>
+      <li><a href="ollama.html"><span class="num">OL</span><span>Ollama + Open WebUI</span></a></li>
+      <li><a href="comfyui.html"><span class="num">CF</span><span>ComfyUI</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 3 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 04 · App CF · ~25 min</p>
+    <h1 class="doc-title">ComfyUI</h1>
+    <p class="doc-lede">
+      ComfyUI is a node-graph-based UI for Stable Diffusion / SDXL / Flux image generation.
+      Powerful, but tight on the Orin Nano's 8 GB shared RAM.
+    </p>
+
+    <div class="note">
+      <span class="note__label">Reality check</span>
+      The Orin Nano Super is the slowest machine you'd reasonably try to run ComfyUI on. A
+      1024x1024 SDXL render takes 60-180 seconds. If you want fast image gen, this isn't the
+      box. Use it because you want offline / private / "look it works on a Jetson", not because
+      you want speed.
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">What runs and what doesn't</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Pipeline</th><th>Memory</th><th>Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>SD 1.5</strong> (512x512)</td>
+          <td>~3 GB</td>
+          <td>Comfortable. The path to take.</td>
+        </tr>
+        <tr>
+          <td><strong>SDXL</strong> (1024x1024, base + refiner)</td>
+          <td>~7 GB</td>
+          <td>Tight. Might OOM on first run, retry usually works. Use single-file checkpoint.</td>
+        </tr>
+        <tr>
+          <td><strong>SDXL Turbo / Lightning</strong> (1-4 step)</td>
+          <td>~5 GB</td>
+          <td>Best quality-per-second on this hardware. Recommended.</td>
+        </tr>
+        <tr>
+          <td><strong>Flux</strong> (any size)</td>
+          <td>12+ GB</td>
+          <td>Doesn't fit. Don't bother.</td>
+        </tr>
+        <tr>
+          <td><strong>Video models (CogVideoX, etc.)</strong></td>
+          <td>16+ GB</td>
+          <td>Doesn't fit.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      For SDXL: use a single-file <code class="inline">safetensors</code> checkpoint (e.g.
+      <code class="inline">juggernautXL</code>, <code class="inline">realisticVisionXL</code>),
+      not the separated UNet/CLIP/VAE setup. Single-file is dramatically more memory-efficient.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Quick install</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash 04-apps/comfyui/install.sh
+</pre>
+    </div>
+
+    <p>The script:</p>
+    <ol>
+      <li>Clones ComfyUI into <code class="inline">~/ComfyUI</code></li>
+      <li>Sets up a Python venv with the right PyTorch / xformers builds for JetPack 6</li>
+      <li>Installs ComfyUI-Manager (extension manager) for easy custom-node installs</li>
+      <li>Downloads SD 1.5 v1-5-pruned (only ~4 GB) as a known-working starter checkpoint</li>
+      <li>Creates a systemd unit so it auto-starts on boot (optional)</li>
+    </ol>
+
+    <div class="section-label">
+      <p class="section-label__text">After install</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Browser</span><button class="term__copy">Copy</button></div>
+<pre class="term__body">http://&lt;jetson-ip&gt;:8188
+</pre>
+    </div>
+
+    <p>Drag-drop the default workflow JSON to get started. The Manager tab (right side) lets you install custom nodes.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Where to put your own checkpoints</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Path</th><th>What</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code class="inline">~/ComfyUI/models/checkpoints/</code></td><td>Base models (.safetensors)</td></tr>
+        <tr><td><code class="inline">~/ComfyUI/models/loras/</code></td><td>LoRAs</td></tr>
+        <tr><td><code class="inline">~/ComfyUI/models/vae/</code></td><td>VAE files</td></tr>
+        <tr><td><code class="inline">~/ComfyUI/models/controlnet/</code></td><td>ControlNet models</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      For SDXL: put <code class="inline">juggernautXL.safetensors</code> (or whatever) in
+      <code class="inline">models/checkpoints/</code>. Restart ComfyUI to pick up new files (or
+      use the Manager's refresh).
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Performance tips</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li><strong>Use SDXL Turbo / Lightning checkpoints.</strong> 1-4 step generation. Cuts render time from 90s to 5-15s, with surprisingly good quality.</li>
+      <li><strong>Keep batch size at 1.</strong> Memory budget is too tight for batches.</li>
+      <li><strong>Use <code class="inline">--lowvram</code> flag</strong> (the install script sets this by default). Keeps things off the GPU until needed.</li>
+      <li><strong>Close everything else.</strong> Stop Hydra and Ollama if you're rendering: <code class="inline">sudo systemctl stop hydra-detect ; sudo systemctl stop ollama</code>.</li>
+    </ul>
+
+    <div class="trap">
+      <div class="trap__head">
+        <span class="trap__num">Trap 04</span>
+        <span class="trap__title">OOM (out of memory) errors will happen.</span>
+      </div>
+      <div class="trap__body">
+        <p>
+          The Jetson's shared 8 GB is just barely enough for SDXL. When you OOM you'll see
+          <code class="inline">RuntimeError: CUDA out of memory.</code> in the log. In order of
+          effort:
+        </p>
+        <ol>
+          <li><strong>Hit "Queue" again.</strong> Sometimes it just works the second time after the first run leaks settled.</li>
+          <li><strong>Stop other apps</strong> (Hydra, Ollama, browser tabs).</li>
+          <li><strong>Drop resolution</strong> to 768x768 or even 512x512. Most SDXL checkpoints are surprisingly tolerant.</li>
+          <li><strong>Switch to a SD 1.5 model</strong> for the run.</li>
+          <li><strong>Reboot the Jetson</strong> if memory is genuinely fragmented (rare).</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Stopping / starting</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="comment"># If you used the systemd service:</span>
+<span class="prompt">$ </span>sudo systemctl stop comfyui
+<span class="prompt">$ </span>sudo systemctl start comfyui
+
+<span class="comment"># Manual run:</span>
+<span class="prompt">$ </span>cd ~/ComfyUI
+<span class="prompt">$ </span>source venv/bin/activate
+<span class="prompt">$ </span>python main.py --listen --lowvram
+</pre>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Uninstall</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo systemctl disable --now comfyui 2&gt;/dev/null || true
+<span class="prompt">$ </span>sudo rm -f /etc/systemd/system/comfyui.service
+<span class="prompt">$ </span>rm -rf ~/ComfyUI
+</pre>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Custom nodes / extensions</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      Install via ComfyUI-Manager (the right-side panel after install). Most community nodes
+      work on Jetson, but ones that depend on x86-only libraries (some triton kernels, some
+      flash-attention builds) won't. If a node fails to import on startup, check its
+      requirements file for <code class="inline">triton</code> or x86-specific binaries.
+    </p>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-04-comfyui" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="ollama.html">‹ Ollama + Open WebUI</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="../index.html">Back to landing ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

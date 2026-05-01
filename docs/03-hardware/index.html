@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Hardware (optional) — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Optional section: wire a Pixhawk flight controller to the Jetson and verify the MAVLink link." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Section 03 · Hardware (optional)" data-resume-href="03-hardware/index.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Section 03 · Hardware (optional)</span>
+    <span class="breadcrumb__counter">SECTION 03 OF 04</span>
+  </div>
+</nav>
+
+<main id="main" class="page">
+
+  <p class="doc-eyebrow">Section 03 · ~30 min · <span class="tag tag--mid">OPTIONAL</span></p>
+  <h1 class="doc-title">Hardware: wire a Pixhawk to the Jetson.</h1>
+  <p class="doc-lede">
+    If your platform from class was a quad, fixed-wing, rover, or boat, your Jetson talks to a
+    Pixhawk flight controller over a serial connection. This section covers the wiring and the
+    MAVLink link test. The Pixhawk's own ArduPilot parameters were configured in class and are
+    not covered here.
+  </p>
+
+  <div class="note">
+    <span class="note__label">Optional</span>
+    Skip this entire section if you do not have a Pixhawk, or if your Jetson is purely a compute
+    payload (Ollama, ComfyUI, no vehicle). Nothing later in the guide depends on it.
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">Steps</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <div class="card-grid">
+    <a class="card" href="01-fc-wiring.html">
+      <span class="card__num">Step 01</span>
+      <span class="card__title">Wire the flight controller</span>
+      <span class="card__desc">USB-C for bench, TELEM2 UART for flight. Three wires, one pinout, one warning about backfeeding power.</span>
+      <span class="card__meta"><span>~20 min</span><span>2 diagrams</span></span>
+    </a>
+    <a class="card" href="02-test-mavlink.html">
+      <span class="card__num">Step 02</span>
+      <span class="card__title">Test MAVLink</span>
+      <span class="card__desc">Install MAVProxy, connect, confirm heartbeat. Common failure modes and the fixes for each.</span>
+      <span class="card__meta"><span>~10 min</span><span>4 fail modes</span></span>
+    </a>
+  </div>
+
+  <div class="pagenav">
+    <a class="btn" href="../02-base-system/index.html">‹ Section 02 · Base system</a>
+    <span class="pagenav__spacer"></span>
+    <a class="btn btn--primary" href="01-fc-wiring.html">Step 01 · Wire the flight controller ›</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

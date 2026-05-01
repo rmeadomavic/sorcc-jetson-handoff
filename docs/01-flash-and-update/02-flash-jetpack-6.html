@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Flash JetPack 6.x — Section 01 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Flash the JetPack 6.x SD card image with Etcher and boot it on the Jetson Orin Nano." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Flash JetPack 6.x · Section 01" data-resume-href="01-flash-and-update/02-flash-jetpack-6.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 01</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Flash JetPack 6.x</span>
+    <span class="breadcrumb__counter">STEP 02 OF 04</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-01-qspi,sec-01-flash,sec-01-oobe,sec-01-maxn">
+    <p class="rail__heading">Section 01</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="01-qspi-update.html"><span class="num">01</span><span>QSPI bootloader update</span></a></li>
+      <li><a href="02-flash-jetpack-6.html"><span class="num">02</span><span>Flash JetPack 6.x</span></a></li>
+      <li><a href="03-first-boot-oobe.html"><span class="num">03</span><span>First-boot wizard</span></a></li>
+      <li><a href="04-maxn-super-mode.html"><span class="num">04</span><span>MAXN Super power mode</span></a></li>
+      <li><a href="troubleshooting.html"><span class="num">!!</span><span>Troubleshooting</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 4 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 01 · Step 02 · ~20 min</p>
+    <h1 class="doc-title">Flash JetPack 6.x</h1>
+    <p class="doc-lede">
+      You have done the QSPI update. Now you flash your real, permanent operating system to a microSD card and boot it.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">What you need</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li>A microSD card, <strong>64 GB+ recommended, UHS-I (Class 10) or faster</strong></li>
+      <li>Etcher on your host PC (Windows, Mac, or Linux)</li>
+      <li>The JetPack 6.x SD card image, see below</li>
+    </ul>
+
+    <h3>Get the JetPack 6.x image</h3>
+    <ol>
+      <li>Go to <a href="https://developer.nvidia.com/embedded/downloads">developer.nvidia.com/embedded/downloads</a>.</li>
+      <li>Find <strong>"JetPack 6.2.1 SD Card Image, Jetson Orin Nano Developer Kit"</strong>, or whatever the latest 6.x is when you read this.</li>
+      <li>Download. The file is about 10 GB and ends in <code class="inline">.img.xz</code>.</li>
+    </ol>
+
+    <div class="note">
+      <span class="note__label">About card quality</span>
+      The cheapest microSD cards on Amazon are often counterfeit and will fail in weird, intermittent ways. Stick to SanDisk Extreme, Samsung EVO Select, or Kingston Canvas Go from a real retailer. A 64 GB card is fine; 128 GB gives you breathing room for ML models.
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">The procedure</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">01</div>
+      <div class="step__body">
+        <h3>Flash the card.</h3>
+        <ol>
+          <li>Plug the SD card into your host PC's reader.</li>
+          <li>Open Etcher.</li>
+          <li><strong>Flash from file</strong>, pick the JP 6.x <code class="inline">.img.xz</code> you downloaded.</li>
+          <li><strong>Select target</strong>, pick your SD card. Etcher will not let you pick your system drive, but double-check the size matches your SD card.</li>
+          <li><strong>Flash.</strong> This takes 10 to 15 minutes depending on card speed.</li>
+          <li>When Etcher finishes, it runs a <strong>verify</strong> pass automatically. <strong>Do not skip verify.</strong> A failed verify means a bad flash and you will save yourself hours by re-flashing now.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">02</div>
+      <div class="step__body">
+        <h3>Boot it.</h3>
+        <ol>
+          <li>Eject the SD card from your host PC.</li>
+          <li>Insert it into the Jetson's microSD slot.</li>
+          <li>Plug in monitor, keyboard, mouse, USB-C power.</li>
+          <li>Power on.</li>
+        </ol>
+        <p>
+          You should see the <strong>NVIDIA logo</strong>, then a Linux boot sequence, then the <strong>Ubuntu first-boot wizard</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">What you might see instead</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li>If you see <strong>nothing</strong>, black screen for more than 2 minutes, your QSPI update probably did not take. Go back to <a href="01-qspi-update.html">Step 01</a> troubleshooting.</li>
+      <li>If you see Linux boot text but it kernel-panics or hangs, your SD card flash is bad. Re-flash with verify enabled.</li>
+      <li>If you see the Ubuntu wizard, congratulations, JetPack 6 is alive. Continue to <a href="03-first-boot-oobe.html">Step 03</a>.</li>
+    </ul>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-01-flash" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="01-qspi-update.html">‹ QSPI bootloader update</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="03-first-boot-oobe.html">First-boot wizard ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

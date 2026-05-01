@@ -111,7 +111,7 @@ a:hover { border-bottom-color: var(--link); }
   width: 48px;
   height: 48px;
   flex: 0 0 48px;
-  background: url('assets/sorcc-logo.png') center/contain no-repeat;
+  background: url('sorcc-logo.png') center/contain no-repeat;
 }
 .site-header__title {
   flex: 1;

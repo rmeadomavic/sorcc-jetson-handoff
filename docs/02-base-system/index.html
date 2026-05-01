@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Base system — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Docker, NVIDIA Container Toolkit, group permissions, and optional Tailscale on a fresh JetPack 6 Jetson." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Section 02 · Base system" data-resume-href="02-base-system/index.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Section 02 · Base system</span>
+    <span class="breadcrumb__counter">SECTION 02 OF 04</span>
+  </div>
+</nav>
+
+<main id="main" class="page">
+
+  <p class="doc-eyebrow">Section 02 · ~20 min</p>
+  <h1 class="doc-title">Base system</h1>
+  <p class="doc-lede">
+    After this section, your Jetson has Docker, the NVIDIA container runtime, the right group
+    permissions, and (optionally) Tailscale for remote access. Every app in Section 04 assumes
+    you have finished this section.
+  </p>
+
+  <div class="section-label">
+    <p class="section-label__text">Quick path</p>
+    <div class="section-label__rule"></div>
+  </div>
+  <p>From the repo root, on your Jetson:</p>
+  <div class="term">
+    <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash 02-base-system/01-base-bootstrap.sh
+</pre>
+  </div>
+  <p>
+    That installs Docker, NVIDIA Container Toolkit, adds you to the <code class="inline">docker</code>
+    and <code class="inline">dialout</code> groups, and pulls the
+    <code class="inline">dustynv/l4t-pytorch:r36.4.0</code> base image (about 6 GB). The script is
+    <strong>idempotent</strong>, safe to re-run, and will not double-install or break existing setup.
+  </p>
+  <p>
+    After it finishes, <strong>log out and back in</strong> (or run
+    <code class="inline">newgrp docker</code>) so the group changes apply. Then verify:
+  </p>
+  <div class="term">
+    <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash 02-base-system/verify.sh
+</pre>
+  </div>
+  <p>
+    If verify is green, continue to the optional Tailscale step or skip ahead to
+    <a href="../04-apps/index.html">Section 04 · Apps</a>.
+  </p>
+
+  <div class="section-label">
+    <p class="section-label__text">Steps in this section</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <div class="card-grid">
+    <a class="card" href="01-base-bootstrap.html">
+      <span class="card__num">Step 01</span>
+      <span class="card__title">Base bootstrap</span>
+      <span class="card__desc">Run the bootstrap script: apt upgrade, Docker, NVIDIA Container Toolkit, base image, groups, swap.</span>
+      <span class="card__meta"><span>~20 min</span><span>Required</span></span>
+    </a>
+    <a class="card" href="02-tailscale.html">
+      <span class="card__num">Step 02</span>
+      <span class="card__title">Tailscale</span>
+      <span class="card__desc">Optional remote access. Stable address, encrypted, no port forwarding.</span>
+      <span class="card__meta"><span>~10 min</span><span>Optional</span></span>
+    </a>
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">What gets installed</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <table class="modern">
+    <thead>
+      <tr><th>Component</th><th>Why</th><th>Script step</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code class="inline">apt update</code> + upgrade</td><td>Base hygiene</td><td>1</td></tr>
+      <tr><td><code class="inline">docker-ce</code></td><td>Container runtime</td><td>2</td></tr>
+      <tr><td><code class="inline">nvidia-container-toolkit</code></td><td>Lets containers see the GPU</td><td>3</td></tr>
+      <tr><td><code class="inline">dustynv/l4t-pytorch:r36.4.0</code></td><td>Pre-built CUDA + PyTorch + TensorRT base image (about 6 GB)</td><td>4</td></tr>
+      <tr><td><code class="inline">$USER</code> in <code class="inline">docker</code> group</td><td>So you can <code class="inline">docker run</code> without sudo</td><td>5</td></tr>
+      <tr><td><code class="inline">$USER</code> in <code class="inline">dialout</code> group</td><td>So Hydra can talk to a Pixhawk on <code class="inline">/dev/ttyACM0</code></td><td>5</td></tr>
+      <tr><td>Swap file (8 GB)</td><td>The 8 GB shared RAM fills up fast under load</td><td>6</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-label">
+    <p class="section-label__text">Files in this section</p>
+    <div class="section-label__rule"></div>
+  </div>
+  <ul>
+    <li><code class="inline">01-base-bootstrap.sh</code>, does everything in the table above.</li>
+    <li><code class="inline">02-tailscale.md</code>, install and configure Tailscale for remote access (optional).</li>
+    <li><code class="inline">verify.sh</code>, checks all of the above worked.</li>
+  </ul>
+
+  <div class="section-label">
+    <p class="section-label__text">What this section does NOT do</p>
+    <div class="section-label__rule"></div>
+  </div>
+  <ul>
+    <li>No app installs (Hydra, Ollama, ComfyUI). Those are in <a href="../04-apps/index.html">Section 04</a>.</li>
+    <li>No flight controller wiring. That is <a href="../03-hardware/index.html">Section 03</a>.</li>
+    <li>No platform-specific config (callsign, hostname, etc). The original golden image had a <code class="inline">platform-setup.sh</code> for that. For a personal Jetson, you usually do not need per-unit identity.</li>
+  </ul>
+
+  <div class="pagenav">
+    <a class="btn" href="../01-flash-and-update/index.html">‹ Flash &amp; update</a>
+    <span class="pagenav__spacer"></span>
+    <a class="btn btn--primary" href="01-base-bootstrap.html">Base bootstrap ›</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Tailscale (optional) — Section 02 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Optional: install Tailscale on the Jetson for a stable, encrypted address you can reach from anywhere." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Tailscale (optional) · Section 02" data-resume-href="02-base-system/02-tailscale.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 02</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Tailscale (optional)</span>
+    <span class="breadcrumb__counter">STEP 02 OF 02</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-02-bootstrap,sec-02-tailscale">
+    <p class="rail__heading">Section 02</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="01-base-bootstrap.html"><span class="num">01</span><span>Base bootstrap</span></a></li>
+      <li><a href="02-tailscale.html"><span class="num">02</span><span>Tailscale (optional)</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 2 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 02 · Step 02 · ~10 min</p>
+    <h1 class="doc-title">Tailscale (optional)</h1>
+    <p class="doc-lede">
+      Tailscale gives your Jetson a stable, secure address that works from anywhere. SSH into it
+      from a coffee shop, point your laptop browser at the Hydra dashboard from across town, all
+      without port forwarding or a public IP.
+    </p>
+
+    <p>
+      This is optional. If your Jetson never leaves your bench Wi-Fi, you can skip Tailscale and
+      just use its LAN IP. Most people will want Tailscale once they have used it.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">What it does</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <ul>
+      <li>Assigns the Jetson a permanent IPv4 address in the <code class="inline">100.x.y.z</code> range that only your devices can reach.</li>
+      <li>Encrypts all traffic to and from the Jetson with WireGuard.</li>
+      <li>Lets you SSH in by hostname (<code class="inline">ssh sorcc@my-jetson</code>) instead of remembering an IP.</li>
+      <li>Optionally enables <strong>Tailscale SSH</strong> so SSH itself is brokered by Tailscale's auth, no SSH keys to manage.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Make a Tailscale account first</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <p>You need your own tailnet. <strong>Do not</strong> use someone else's account.</p>
+    <ol>
+      <li>Go to <a href="https://login.tailscale.com/start">https://login.tailscale.com/start</a>.</li>
+      <li>Sign in with Google, Microsoft, GitHub, or a custom OIDC provider.</li>
+      <li>The free plan covers up to 100 devices and 3 users, plenty for personal use.</li>
+    </ol>
+
+    <div class="section-label">
+      <p class="section-label__text">Install on the Jetson</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <p>Run on the Jetson (not your laptop):</p>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>curl -fsSL https://tailscale.com/install.sh | sh
+</pre>
+    </div>
+    <p>The installer adds Tailscale's apt repo and installs the daemon. Takes about a minute.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Bring it up</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo tailscale up
+</pre>
+    </div>
+    <p>
+      It prints a URL like <code class="inline">https://login.tailscale.com/a/abcdef123</code>.
+      <strong>Open that URL on any device</strong> (your laptop, phone, whatever) and sign in.
+      The Jetson appears in your tailnet.
+    </p>
+    <p>If you want SSH brokered by Tailscale (skip managing your own SSH keys):</p>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo tailscale set --ssh
+</pre>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Verify</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>tailscale ip -4
+<span class="comment"># Prints your Jetson's tailnet IP, e.g. 100.76.40.123</span>
+
+<span class="prompt">$ </span>tailscale status
+<span class="comment"># Lists every device in your tailnet</span>
+</pre>
+    </div>
+    <p>From any device that is signed into the same tailnet:</p>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · host PC</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>ssh sorcc@100.76.40.123
+<span class="comment"># or, if you set a hostname in the Tailscale admin console:</span>
+<span class="prompt">$ </span>ssh sorcc@my-jetson
+</pre>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Setting a friendlier hostname</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <p>
+      In the <a href="https://login.tailscale.com/admin/machines">Tailscale admin console</a>,
+      click your Jetson, then <strong>Edit name</strong> to set something memorable like
+      <code class="inline">my-jetson</code>. With MagicDNS enabled (default), you can then SSH
+      using that name from any tailnet device.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Reaching the Hydra dashboard from anywhere</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <p>
+      Once Hydra is installed (see <code class="inline">04-apps/hydra-detect/</code>), you can
+      hit the dashboard from any tailnet device:
+    </p>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Browser</span><button class="term__copy">Copy</button></div>
+<pre class="term__body">http://&lt;jetson-tailscale-ip&gt;:8080
+</pre>
+    </div>
+    <p>No port forwarding. No public IP. No fiddling.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Things to know</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <ul>
+      <li><strong>Battery life:</strong> Tailscale is very lightweight, you will not notice the impact.</li>
+      <li><strong>Field operations:</strong> if your platform has cellular (e.g. via a Pi 5G hat), Tailscale gives you a stable address even on a roaming IP.</li>
+      <li><strong>Sharing:</strong> you can share specific machines with other tailnet users via the admin console. Useful if you want a teammate to be able to access your Jetson without giving them your whole tailnet.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Removing the Jetson from your tailnet</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <p>Two steps:</p>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo tailscale logout
+<span class="prompt">$ </span>sudo apt remove --purge tailscale
+</pre>
+    </div>
+    <p>
+      And in the <a href="https://login.tailscale.com/admin/machines">admin console</a>, delete
+      the device entry.
+    </p>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-02-tailscale" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="01-base-bootstrap.html">‹ Base bootstrap</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="../03-hardware/index.html">Hardware ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Flash &amp; update — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Take a stock Jetson Orin Nano dev kit from JetPack 5.1.x to JetPack 6.x in MAXN Super power mode." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Section 01 · Flash &amp; update" data-resume-href="01-flash-and-update/index.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Section 01 · Flash &amp; update</span>
+    <span class="breadcrumb__counter">SECTION 01 OF 04</span>
+  </div>
+</nav>
+
+<main id="main" class="page">
+
+  <p class="doc-eyebrow">Section 01 · ~90 min</p>
+  <h1 class="doc-title">Flash &amp; update</h1>
+  <p class="doc-lede">
+    This is the hard part. You are taking the Jetson from a stock-from-NVIDIA dev kit, which ships with old firmware
+    that cannot boot JetPack 6, all the way to a fully updated JetPack 6.x system in MAXN Super power mode. Do these
+    in order. Do not skip ahead.
+  </p>
+
+  <div class="section-label">
+    <p class="section-label__text">The path · four steps</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <div class="term">
+    <div class="term__head">
+      <span class="term__label">Path overview</span>
+      <button class="term__copy">Copy</button>
+    </div>
+<pre class="term__body">┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│ 01-qspi-update   │ →  │ 02-flash-jp6     │ →  │ 03-first-boot    │ →  │ 04-maxn-super    │
+│                  │    │                  │    │                  │    │                  │
+│ Update the       │    │ Flash JetPack    │    │ Walk through     │    │ Switch the board │
+│ bootloader from  │    │ 6.x to your real │    │ the Ubuntu       │    │ into 25W MAXN    │
+│ a JP 5.1.3 SD    │    │ SD card and      │    │ first-boot       │    │ Super power mode │
+│ card             │    │ boot it          │    │ wizard           │    │                  │
+└──────────────────┘    └──────────────────┘    └──────────────────┘    └──────────────────┘
+   ~30 minutes            ~20 minutes              ~30 minutes             ~5 minutes
+</pre>
+  </div>
+
+  <p>When you finish all four, your Jetson is on JetPack 6.x at full power and ready for <code class="inline">02-base-system/</code>.</p>
+
+  <div class="section-label">
+    <p class="section-label__text">Pick a step</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <div class="card-grid">
+    <a class="card" href="01-qspi-update.html">
+      <span class="card__num">Step 01</span>
+      <span class="card__title">QSPI bootloader update</span>
+      <span class="card__desc">Boot a JP 5.1.3 card and flash new QSPI firmware so the board can boot JP 6.x.</span>
+      <span class="card__meta"><span>~30 min</span><span>2 traps</span></span>
+    </a>
+    <a class="card" href="02-flash-jetpack-6.html">
+      <span class="card__num">Step 02</span>
+      <span class="card__title">Flash JetPack 6.x</span>
+      <span class="card__desc">Etcher the JP 6.x image to your real microSD card and boot it on the Jetson.</span>
+      <span class="card__meta"><span>~20 min</span><span>SD card</span></span>
+    </a>
+    <a class="card" href="03-first-boot-oobe.html">
+      <span class="card__num">Step 03</span>
+      <span class="card__title">First-boot wizard</span>
+      <span class="card__desc">Ubuntu OOBE: account, Wi-Fi, Chromium, then the 30-minute software update.</span>
+      <span class="card__meta"><span>~30 min</span><span>OOBE</span></span>
+    </a>
+    <a class="card" href="04-maxn-super-mode.html">
+      <span class="card__num">Step 04</span>
+      <span class="card__title">MAXN Super power mode</span>
+      <span class="card__desc">Switch to 25W MAXN Super for ~1.7x GPU compute. Required for the apps section.</span>
+      <span class="card__meta"><span>~5 min</span><span>nvpmodel</span></span>
+    </a>
+    <a class="card" href="troubleshooting.html">
+      <span class="card__num">!!</span>
+      <span class="card__title">Troubleshooting</span>
+      <span class="card__desc">Every failure mode anyone has hit on this section. Read it before you panic.</span>
+      <span class="card__meta"><span>reference</span><span>read first</span></span>
+    </a>
+  </div>
+
+  <div class="section-label">
+    <p class="section-label__text">How to know you can skip a step</p>
+    <div class="section-label__rule"></div>
+  </div>
+
+  <ul>
+    <li><strong>Skip QSPI update</strong> if you have already booted JetPack 6.x on this exact board before. Verify with <code class="inline">cat /etc/nv_tegra_release</code>. If it starts with <code class="inline"># R36</code>, you do not need QSPI.</li>
+    <li><strong>Skip flash and first boot</strong> if your Jetson already has a working JetPack 6.x install you do not want to wipe.</li>
+    <li><strong>You probably cannot skip MAXN Super</strong> unless you specifically remember setting it. Check with <code class="inline">sudo nvpmodel -q</code>.</li>
+  </ul>
+
+  <div class="note">
+    <span class="note__label">Stuck?</span>
+    The single most common failure: the QSPI updater package name has a lowercase L, not a number 1. <code class="inline">nvidia-l4t-...</code> not <code class="inline">nvidia-14t-...</code>. If apt says "Unable to locate package", check this first. <a href="troubleshooting.html">Troubleshooting</a> covers every other failure mode anyone has hit.
+  </div>
+
+  <div class="pagenav">
+    <a class="btn" href="../00-before-you-start/index.html">‹ Before you start</a>
+    <span class="pagenav__spacer"></span>
+    <a class="btn btn--primary" href="01-qspi-update.html">QSPI bootloader update ›</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

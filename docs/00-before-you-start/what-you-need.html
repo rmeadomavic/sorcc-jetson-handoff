@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>What you need — Section 00 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Gather list before you start the Jetson flash: cables, cards, host PC software, downloads." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="What you need · Section 00" data-resume-href="00-before-you-start/what-you-need.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 00</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">What you need</span>
+    <span class="breadcrumb__counter">DOC 2 OF 3</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="">
+    <p class="rail__heading">Section 00</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="what-you-have.html"><span class="num">01</span><span>What you have</span></a></li>
+      <li><a href="what-you-need.html"><span class="num">02</span><span>What you need</span></a></li>
+      <li><a href="support.html"><span class="num">03</span><span>Support</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 0 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 00 · Doc 02 · ~2 min</p>
+    <h1 class="doc-title">What you need</h1>
+    <p class="doc-lede">
+      Gather all of this before you start the flash process. Stopping halfway because you
+      don't have a USB-C cable is annoying.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Required for everyone</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li><strong>Your Jetson Orin Nano Super dev kit</strong> (with carrier board, compute module, heatsink)</li>
+      <li><strong>The SORCC microSD card</strong> (or a fresh 64 GB+ UHS-I card if you've lost it)</li>
+      <li><strong>A second microSD card</strong>, 32 GB or larger. Temporary, used for the QSPI update step. Reusable after.</li>
+      <li><strong>The USB-C power supply</strong> that came with your kit (5V / 3A). A phone charger will undervolt and cause weird crashes. Do not skip this.</li>
+      <li><strong>A monitor</strong> with HDMI or DisplayPort</li>
+      <li><strong>A USB keyboard and mouse</strong></li>
+      <li><strong>An Ethernet cable or known-good Wi-Fi network</strong> for the package downloads</li>
+      <li><strong>A host computer</strong> (Windows / Mac / Linux) with:
+        <ul>
+          <li>A microSD card reader</li>
+          <li><strong><a href="https://etcher.balena.io/">Balena Etcher</a></strong> installed (free, cross-platform)</li>
+          <li>Internet (you'll be downloading 8-15 GB total)</li>
+        </ul>
+      </li>
+      <li><strong>Time:</strong> budget 90 min for the flash + base setup. Apps in <code class="inline">04-apps/</code> add another 15-60 min each.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Required only if you're wiring a flight controller</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li><strong>Pixhawk 6C</strong> (or compatible ArduPilot FC)</li>
+      <li><strong>Pixhawk JST-GH TELEM2 cable</strong> (came with your Pixhawk; 6-pin)</li>
+      <li><strong>Three jumper wires (female-to-female, dupont)</strong> OR a custom JST-GH-to-Dupont harness
+        <ul>
+          <li>You only need 3 wires of the 6: TX, RX, GND</li>
+        </ul>
+      </li>
+      <li><strong>A USB-C cable</strong> for first-time bench connection (connects Jetson to Pixhawk)</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Required only if you'll use SDR / Kismet RF features</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li><strong>NooElec NESDR Smart v5</strong> (RTL-SDR, the blue one with the case) or any other RTL2832U-based dongle</li>
+      <li><strong>An SMA antenna</strong> appropriate for your band (the stock one works for 433/915 MHz)</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Files you will download</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>These show up at specific steps in the flash docs. Don't pre-download, Etcher is happiest if the file is fresh:</p>
+
+    <ul>
+      <li><strong>JetPack 5.1.3 SD card image</strong>, needed for the QSPI step. From <a href="https://developer.nvidia.com/embedded/downloads">NVIDIA Jetson Downloads</a>. Filename ends in <code class="inline">.img.xz</code>.</li>
+      <li><strong>JetPack 6.x SD card image</strong>, your final OS. From the same page. Currently 6.2.1.</li>
+      <li>(Optional) <strong>The SORCC golden image</strong>, if Kyle gives you a copy, this skips the JetPack 6 + Hydra install steps.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Network notes</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li>The Jetson will pull ~6 GB of Docker images during <code class="inline">02-base-system/</code> and again per app in <code class="inline">04-apps/</code>. Don't do this on a metered connection.</li>
+      <li>The QSPI step needs apt to reach NVIDIA's package repo. If you're on a captive-portal network (hotel, coffee shop), the apt install will silently fail. Use a phone hotspot or home Wi-Fi.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">What you do NOT need</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li>Any cloud account (GitHub, Google, Anthropic)</li>
+      <li>Any paid software</li>
+      <li>A second computer beyond the host you're using to flash the SD card</li>
+      <li>The original SORCC laptop / GCS, your Jetson is standalone now</li>
+    </ul>
+
+    <div class="pagenav">
+      <a class="btn" href="what-you-have.html">‹ What you have</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="support.html">Support ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

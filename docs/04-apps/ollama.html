@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Ollama + Open WebUI — Section 04 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Install Ollama and Open WebUI on the Jetson for a private, offline ChatGPT-style local LLM stack." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Ollama + Open WebUI · Section 04" data-resume-href="04-apps/ollama.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 04</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Ollama + Open WebUI</span>
+    <span class="breadcrumb__counter">APP 2 OF 3</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-04-hydra,sec-04-ollama,sec-04-comfyui">
+    <p class="rail__heading">Section 04</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="hydra-detect.html"><span class="num">HD</span><span>Hydra Detect</span></a></li>
+      <li><a href="ollama.html"><span class="num">OL</span><span>Ollama + Open WebUI</span></a></li>
+      <li><a href="comfyui.html"><span class="num">CF</span><span>ComfyUI</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 3 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 04 · App OL · ~20 min</p>
+    <h1 class="doc-title">Ollama + Open WebUI</h1>
+    <p class="doc-lede">
+      Ollama is a local LLM runtime. Pull a model, chat with it, no cloud. Open WebUI is a
+      ChatGPT-style web frontend that talks to Ollama. Together they give you a private LLM
+      stack on the Jetson.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">What works on 8 GB shared RAM</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      The Jetson Orin Nano shares its 8 GB between CPU and GPU. After Linux + Docker
+      (~1.5 GB), you have roughly 6 to 6.5 GB for the model.
+    </p>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Model</th><th>Size</th><th>Real use</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code class="inline">phi3:mini</code> (3.8B)</td>
+          <td>~2.3 GB</td>
+          <td>Fast, surprisingly good for its size. Default recommendation.</td>
+        </tr>
+        <tr>
+          <td><code class="inline">gemma2:2b</code></td>
+          <td>~1.6 GB</td>
+          <td>Smallest viable. Works for quick Q&amp;A and summarization.</td>
+        </tr>
+        <tr>
+          <td><code class="inline">llama3:8b-instruct-q4_0</code></td>
+          <td>~4.7 GB</td>
+          <td>Better answers, slower (~3-5 tok/sec). The biggest you should run.</td>
+        </tr>
+        <tr>
+          <td><code class="inline">qwen2.5-coder:3b</code></td>
+          <td>~1.9 GB</td>
+          <td>If you want code completion / programming assistant.</td>
+        </tr>
+        <tr>
+          <td><code class="inline">deepseek-r1:8b</code></td>
+          <td>~5 GB</td>
+          <td>Reasoning model. Slow, but interesting for tough problems.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Models 13B and larger</strong> will not fit. Don't bother trying.</p>
+
+    <p>You can have multiple models pulled at once (only one runs at a time), but they each take disk space.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Quick install</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash 04-apps/ollama/install.sh
+</pre>
+    </div>
+
+    <p>This will:</p>
+    <ol>
+      <li>Install Ollama natively (not in Docker; Ollama uses its own GPU integration which is finicky in containers).</li>
+      <li>Run Open WebUI in Docker.</li>
+      <li>Pull <code class="inline">phi3:mini</code> as a starter model.</li>
+      <li>Print the URL to access the chat UI.</li>
+    </ol>
+
+    <p>After it finishes, open your browser:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Browser</span><button class="term__copy">Copy</button></div>
+<pre class="term__body">http://&lt;jetson-ip&gt;:3000
+</pre>
+    </div>
+
+    <p>Create an account (the first user is auto-admin), then start chatting.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Pulling more models</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>From the Open WebUI settings, or directly:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>ollama pull llama3:8b-instruct-q4_0
+<span class="prompt">$ </span>ollama pull gemma2:2b
+<span class="prompt">$ </span>ollama list
+</pre>
+    </div>
+
+    <h2>Memory pressure</h2>
+
+    <p>
+      If you start a model and your Jetson becomes unresponsive, you've blown the memory
+      budget. Fixes:
+    </p>
+
+    <ul>
+      <li><strong>Close other heavy apps.</strong> Hydra Detect uses 2-3 GB GPU memory; running it concurrently with an 8B Ollama model is too tight.</li>
+      <li><strong>Use a smaller model.</strong> Switching from <code class="inline">llama3:8b</code> to <code class="inline">phi3:mini</code> halves the footprint.</li>
+      <li><strong>Add more swap.</strong> The bootstrap script creates 8 GB; you can extend to 16 GB if you really need it. Swap is much slower than RAM, but it prevents OOM kills.</li>
+    </ul>
+
+    <p>Monitor live with:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>tegrastats --interval 1000
+</pre>
+    </div>
+
+    <p>Look for the <code class="inline">RAM</code> line. When it gets to ~7000 MB / 7800 MB, you're at the edge.</p>
+
+    <h2>Performance expectations</h2>
+
+    <p>On MAXN Super (25W), with a small model like <code class="inline">phi3:mini</code>:</p>
+    <ul>
+      <li>First-token latency: ~1-3 seconds</li>
+      <li>Generation speed: ~15-25 tokens/second</li>
+    </ul>
+
+    <p>With <code class="inline">llama3:8b-instruct-q4_0</code>:</p>
+    <ul>
+      <li>First-token latency: ~5-10 seconds</li>
+      <li>Generation speed: ~3-5 tokens/second</li>
+    </ul>
+
+    <p>These aren't fast, but they're free, private, and offline.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Stopping / starting</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="comment"># Stop Open WebUI</span>
+<span class="prompt">$ </span>sudo docker stop open-webui
+
+<span class="comment"># Stop Ollama</span>
+<span class="prompt">$ </span>sudo systemctl stop ollama
+
+<span class="comment"># Start them back up</span>
+<span class="prompt">$ </span>sudo systemctl start ollama
+<span class="prompt">$ </span>sudo docker start open-webui
+</pre>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Where things live</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Path</th><th>What</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code class="inline">/usr/local/bin/ollama</code></td><td>Ollama binary</td></tr>
+        <tr><td><code class="inline">/etc/systemd/system/ollama.service</code></td><td>systemd unit (Ollama runs as a system service)</td></tr>
+        <tr><td><code class="inline">~/.ollama/models/</code></td><td>Pulled models (can grow to many GB)</td></tr>
+        <tr><td>Docker container <code class="inline">open-webui</code></td><td>Open WebUI</td></tr>
+        <tr><td>Open WebUI volume <code class="inline">open-webui-data</code></td><td>Chat history, user accounts</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">
+      <p class="section-label__text">Uninstall</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo systemctl disable --now ollama
+<span class="prompt">$ </span>sudo rm -f /usr/local/bin/ollama
+<span class="prompt">$ </span>sudo rm -rf /etc/systemd/system/ollama.service
+<span class="prompt">$ </span>sudo docker rm -f open-webui
+<span class="prompt">$ </span>sudo docker volume rm open-webui-data
+<span class="prompt">$ </span>rm -rf ~/.ollama
+</pre>
+    </div>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-04-ollama" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="hydra-detect.html">‹ Hydra Detect</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="comfyui.html">ComfyUI ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

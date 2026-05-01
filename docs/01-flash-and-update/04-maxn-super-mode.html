@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MAXN Super power mode — Section 01 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Switch the Jetson Orin Nano Super to 25W MAXN Super power mode for full GPU compute." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="MAXN Super power mode · Section 01" data-resume-href="01-flash-and-update/04-maxn-super-mode.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 01</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">MAXN Super power mode</span>
+    <span class="breadcrumb__counter">STEP 04 OF 04</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-01-qspi,sec-01-flash,sec-01-oobe,sec-01-maxn">
+    <p class="rail__heading">Section 01</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="01-qspi-update.html"><span class="num">01</span><span>QSPI bootloader update</span></a></li>
+      <li><a href="02-flash-jetpack-6.html"><span class="num">02</span><span>Flash JetPack 6.x</span></a></li>
+      <li><a href="03-first-boot-oobe.html"><span class="num">03</span><span>First-boot wizard</span></a></li>
+      <li><a href="04-maxn-super-mode.html"><span class="num">04</span><span>MAXN Super power mode</span></a></li>
+      <li><a href="troubleshooting.html"><span class="num">!!</span><span>Troubleshooting</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 4 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 01 · Step 04 · ~5 min</p>
+    <h1 class="doc-title">MAXN Super power mode</h1>
+    <p class="doc-lede">
+      The Jetson Orin Nano Super can run at <strong>25W</strong> (MAXN Super power mode), but ships at lower power modes by default.
+      Bumping it to MAXN Super gives you noticeably more performance, roughly 1.7x the GPU compute and TFLOPS, at the cost of a bit
+      more heat and a louder fan. For Hydra Detect, Ollama, ComfyUI, and basically anything compute-heavy: you want MAXN Super.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">What modes are there</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head">
+        <span class="term__label">Shell · sorcc@jetson</span>
+        <button class="term__copy">Copy</button>
+      </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo nvpmodel -q --verbose
+</pre>
+    </div>
+
+    <p>This lists every power mode your Jetson supports. On Orin Nano Super you will see:</p>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Mode</th><th>Name</th><th>Wattage</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>0</td><td><code class="inline">MAXN_SUPER</code></td><td>up to 25W</td><td>What you want, highest performance</td></tr>
+        <tr><td>1</td><td>15W</td><td>15W</td><td>Original Orin Nano default</td></tr>
+        <tr><td>2</td><td>7W</td><td>7W</td><td>Power-constrained, very slow</td></tr>
+      </tbody>
+    </table>
+
+    <p>The current mode is shown in the same output.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">The procedure</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">01</div>
+      <div class="step__body">
+        <h3>Switch to MAXN Super.</h3>
+        <div class="term">
+          <div class="term__head">
+            <span class="term__label">Shell · sorcc@jetson</span>
+            <button class="term__copy">Copy</button>
+          </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo nvpmodel -m 0
+</pre>
+        </div>
+        <p>Confirm:</p>
+        <div class="term">
+          <div class="term__head">
+            <span class="term__label">Shell · sorcc@jetson</span>
+            <button class="term__copy">Copy</button>
+          </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo nvpmodel -q
+<span class="comment"># Expected: NV Power Mode: MAXN_SUPER</span>
+</pre>
+        </div>
+        <p>The change is immediate and survives reboots.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">02</div>
+      <div class="step__body">
+        <h3>Lock clocks high (optional).</h3>
+        <p>
+          <code class="inline">nvpmodel</code> sets the <em>ceiling</em>. By default the Jetson dynamically scales down when idle.
+          For sustained workloads (Hydra running 24/7, an Ollama session, a ComfyUI render) you usually want clocks pinned high:
+        </p>
+        <div class="term">
+          <div class="term__head">
+            <span class="term__label">Shell · sorcc@jetson</span>
+            <button class="term__copy">Copy</button>
+          </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo jetson_clocks
+</pre>
+        </div>
+        <p>
+          This locks GPU and CPU clocks at their max for the current power mode. <strong>It does NOT survive reboot.</strong>
+          If you want it on every boot, add to <code class="inline">/etc/rc.local</code> or a systemd service. For most people,
+          running it manually before a session is fine.
+        </p>
+        <p>To go back to dynamic scaling without rebooting:</p>
+        <div class="term">
+          <div class="term__head">
+            <span class="term__label">Shell · sorcc@jetson</span>
+            <button class="term__copy">Copy</button>
+          </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo jetson_clocks --restore
+</pre>
+        </div>
+        <p>(<code class="inline">jetson_clocks</code> writes the previous state to <code class="inline">~/l4t_dfs.conf</code> when first run, and <code class="inline">--restore</code> reads from there.)</p>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">What to expect</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li><strong>Fan:</strong> more aggressive. The stock fan is loud at MAXN Super; not a defect.</li>
+      <li><strong>Heat:</strong> the heatsink will be hot to the touch under sustained load. Normal.</li>
+      <li><strong>Throttle point:</strong> Orin Nano starts thermal-throttling around 80&deg;C. If you are hitting that consistently, improve airflow.</li>
+      <li><strong>Power draw:</strong> a higher-quality power supply matters more here. The official 5V/3A adapter is fine. Random USB-C cables and chargers will undervolt and reboot.</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Verify with tegrastats</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>Run <code class="inline">tegrastats</code> to see live CPU/GPU usage and temps. Useful if you want to confirm the Jetson is actually using the headroom MAXN Super gives it.</p>
+
+    <div class="term">
+      <div class="term__head">
+        <span class="term__label">Shell · sorcc@jetson</span>
+        <button class="term__copy">Copy</button>
+      </div>
+<pre class="term__body"><span class="prompt">$ </span>sudo tegrastats --interval 1000
+</pre>
+    </div>
+
+    <p>Press Ctrl+C to stop. You are looking for:</p>
+
+    <ul>
+      <li><code class="inline">RAM</code>, how much of the 8 GB is used</li>
+      <li><code class="inline">GR3D_FREQ</code>, GPU frequency, should be ~1020 MHz under load on MAXN Super</li>
+      <li><code class="inline">tj@</code>, junction temperature, keep below 80&deg;C</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Done</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>You are now on JetPack 6.x at full power. Continue to <a href="../02-base-system/index.html">Section 02 · Base system</a>.</p>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-01-maxn" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="03-first-boot-oobe.html">‹ First-boot wizard</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="../02-base-system/index.html">Section 02 · Base system ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

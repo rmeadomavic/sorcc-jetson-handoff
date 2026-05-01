@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Base bootstrap — Section 02 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Run the idempotent base bootstrap: apt upgrade, Docker, NVIDIA Container Toolkit, base image pull, group membership, and an 8 GB swap file." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Base bootstrap · Section 02" data-resume-href="02-base-system/01-base-bootstrap.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 02</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Base bootstrap</span>
+    <span class="breadcrumb__counter">STEP 01 OF 02</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-02-bootstrap,sec-02-tailscale">
+    <p class="rail__heading">Section 02</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="01-base-bootstrap.html"><span class="num">01</span><span>Base bootstrap</span></a></li>
+      <li><a href="02-tailscale.html"><span class="num">02</span><span>Tailscale (optional)</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 2 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 02 · Step 01 · ~20 min</p>
+    <h1 class="doc-title">Base bootstrap</h1>
+    <p class="doc-lede">
+      One script. Six steps. It brings a fresh JetPack 6 Jetson Orin Nano up to a state where
+      every app in Section 04 can run. Safe to re-run, each step checks for existing state before
+      acting.
+    </p>
+
+    <div class="note">
+      <span class="note__label">Heads up</span>
+      The base image pull in Step 04 is about 6 GB. On a hotspot or slow link, plan for 30 minutes
+      or more on that step alone. The rest of the script finishes in a few minutes.
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Run it</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <p>From the repo root, on the Jetson:</p>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash 02-base-system/01-base-bootstrap.sh
+</pre>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">What the script does, step by step</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">01</div>
+      <div class="step__body">
+        <h3>apt update and upgrade.</h3>
+        <p>
+          Brings every system package up to date. Without this, later steps can fail on stale
+          package indexes or hold-back conflicts. Runs non-interactively so it does not stop on
+          a config-file prompt.
+        </p>
+        <div class="term">
+          <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo apt-get update
+<span class="prompt">$ </span>sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">02</div>
+      <div class="step__body">
+        <h3>Install Docker CE.</h3>
+        <p>
+          Container runtime. JetPack 6 already has NVIDIA's apt repo configured, so this is a
+          simple <code class="inline">apt-get install docker.io</code> followed by enabling the
+          service. If Docker is already installed, the script prints the existing version and
+          skips.
+        </p>
+        <div class="term">
+          <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo apt-get install -y docker.io
+<span class="prompt">$ </span>sudo systemctl enable --now docker
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">03</div>
+      <div class="step__body">
+        <h3>Install NVIDIA Container Toolkit.</h3>
+        <p>
+          This is the bridge that lets containers see the GPU. Without it, every Hydra, Ollama,
+          and ComfyUI run will fail with no CUDA device. Installing the package and restarting
+          Docker is enough, no manual <code class="inline">daemon.json</code> editing required on
+          JetPack 6.
+        </p>
+        <div class="term">
+          <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo apt-get install -y nvidia-container-toolkit
+<span class="prompt">$ </span>sudo systemctl restart docker
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">04</div>
+      <div class="step__body">
+        <h3>Pull the base Docker image.</h3>
+        <p>
+          The image is <code class="inline">dustynv/l4t-pytorch:r36.4.0</code>, about 6 GB. It
+          carries CUDA, PyTorch, and TensorRT pre-built for L4T R36.4. Every app in Section 04
+          builds on top of it. If the image is already present locally, the script skips the
+          pull.
+        </p>
+        <div class="term">
+          <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo docker pull dustynv/l4t-pytorch:r36.4.0
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">05</div>
+      <div class="step__body">
+        <h3>Add your user to docker and dialout groups.</h3>
+        <p>
+          <code class="inline">docker</code> means you can run containers without
+          <code class="inline">sudo</code>. <code class="inline">dialout</code> means you can read
+          and write the serial port a Pixhawk shows up on
+          (<code class="inline">/dev/ttyACM0</code>). After this step you must
+          <strong>log out and back in</strong>, or run
+          <code class="inline">newgrp docker</code>, before the new groups apply.
+        </p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step__num">06</div>
+      <div class="step__body">
+        <h3>Create an 8 GB swap file.</h3>
+        <p>
+          The 8 GB shared RAM on the Orin Nano fills up fast once a model is loaded and a
+          container is running. An 8 GB swap file at <code class="inline">/swapfile</code> keeps
+          the system from being OOM-killed under load. The script writes an
+          <code class="inline">/etc/fstab</code> entry so swap survives reboot.
+        </p>
+        <div class="term">
+          <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo fallocate -l 8G /swapfile
+<span class="prompt">$ </span>sudo chmod 600 /swapfile
+<span class="prompt">$ </span>sudo mkswap /swapfile
+<span class="prompt">$ </span>sudo swapon /swapfile
+<span class="prompt">$ </span>echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">After the script finishes</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <p>
+      Log out and back in (or run <code class="inline">newgrp docker</code>) so the group
+      additions in Step 05 take effect. Then run the project's preflight to confirm the system
+      is ready for apps.
+    </p>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash scripts/preflight.sh
+
+<span class="ok">OK</span>   JetPack 6.x (L4T R36.4.x)
+<span class="ok">OK</span>   Power mode: MAXN_SUPER
+<span class="ok">OK</span>   Docker installed
+<span class="ok">OK</span>   nvidia-container-toolkit installed
+<span class="ok">OK</span>   User in docker group
+<span class="ok">OK</span>   User in dialout group
+<span class="ok">OK</span>   Base image dustynv/l4t-pytorch:r36.4.0 present
+<span class="ok">OK</span>   Swap: 8192 MB
+</pre>
+    </div>
+
+    <p>That output corresponds to the components the bootstrap installs:</p>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Component</th><th>Why</th><th>Script step</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code class="inline">apt update</code> + upgrade</td><td>Base hygiene</td><td>1</td></tr>
+        <tr><td><code class="inline">docker-ce</code></td><td>Container runtime</td><td>2</td></tr>
+        <tr><td><code class="inline">nvidia-container-toolkit</code></td><td>Lets containers see the GPU</td><td>3</td></tr>
+        <tr><td><code class="inline">dustynv/l4t-pytorch:r36.4.0</code></td><td>Pre-built CUDA + PyTorch + TensorRT base image (about 6 GB)</td><td>4</td></tr>
+        <tr><td><code class="inline">$USER</code> in <code class="inline">docker</code> group</td><td>So you can <code class="inline">docker run</code> without sudo</td><td>5</td></tr>
+        <tr><td><code class="inline">$USER</code> in <code class="inline">dialout</code> group</td><td>So Hydra can talk to a Pixhawk on <code class="inline">/dev/ttyACM0</code></td><td>5</td></tr>
+        <tr><td>Swap file (8 GB)</td><td>The 8 GB shared RAM fills up fast under load</td><td>6</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">
+      <p class="section-label__text">Validate</p>
+      <div class="section-label__rule"></div>
+    </div>
+    <p>
+      The section ships a deeper check that actually runs a container and confirms CUDA is
+      visible inside it. Run this before you move on:
+    </p>
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash 02-base-system/verify.sh
+</pre>
+    </div>
+    <p>
+      Green across the board means the base system is ready for any app in
+      <a href="../04-apps/index.html">Section 04</a>.
+    </p>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-02-bootstrap" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="index.html">‹ Section 02 overview</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="02-tailscale.html">Tailscale (optional) ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>

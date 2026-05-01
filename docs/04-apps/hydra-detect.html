@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Hydra Detect — Section 04 — SORCC Jetson Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Install Hydra Detect: real-time object detection and tracking with MAVLink alerts, dashboard, and RTSP stream." />
+<link rel="stylesheet" href="../assets/sorcc.css" />
+</head>
+<body data-resume-label="Hydra Detect · Section 04" data-resume-href="04-apps/hydra-detect.html">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="classification">UNCLASSIFIED</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__logo" role="img" aria-label="SORCC logo"></div>
+    <div class="site-header__title">
+      <div class="site-header__title-line"><a href="../index.html">SORCC Jetson Handoff</a></div>
+      <div class="site-header__sub">Oak Grove Technologies · self-serve guide for SORCC graduates</div>
+    </div>
+    <div class="site-header__meta">
+      <div>JETPACK 6.2.1</div>
+      <div>L4T R36.4.X · ORIN NANO 8GB</div>
+      <button data-theme-toggle aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <div class="breadcrumb__inner">
+    <a href="../index.html">SORCC Jetson Handoff</a>
+    <span class="breadcrumb__sep">›</span>
+    <a href="index.html">Section 04</a>
+    <span class="breadcrumb__sep">›</span>
+    <span class="breadcrumb__current">Hydra Detect</span>
+    <span class="breadcrumb__counter">APP 1 OF 3</span>
+  </div>
+</nav>
+
+<div class="layout-with-rail">
+
+  <aside class="rail" data-rail-progress="sec-04-hydra,sec-04-ollama,sec-04-comfyui">
+    <p class="rail__heading">Section 04</p>
+    <ol>
+      <li><a href="index.html"><span class="num">00</span><span>Overview</span></a></li>
+      <li><a href="hydra-detect.html"><span class="num">HD</span><span>Hydra Detect</span></a></li>
+      <li><a href="ollama.html"><span class="num">OL</span><span>Ollama + Open WebUI</span></a></li>
+      <li><a href="comfyui.html"><span class="num">CF</span><span>ComfyUI</span></a></li>
+    </ol>
+    <div class="rail__progress">
+      <div class="rail__progress-track">
+        <div class="rail__progress-fill"></div>
+      </div>
+      <div class="rail__progress-label">0 / 3 STEPS</div>
+    </div>
+  </aside>
+
+  <main id="main" class="content">
+
+    <p class="doc-eyebrow">Section 04 · App HD · ~30 min</p>
+    <h1 class="doc-title">Hydra Detect</h1>
+    <p class="doc-lede">
+      Hydra Detect is the real-time object detection and tracking payload you used in class.
+      Camera in, YOLO detection, ByteTrack tracking, MAVLink alerts to your Pixhawk, plus a web
+      dashboard, RTSP stream, and optional TAK output. This page covers installing it. Operating
+      it (mission profiles, geofencing, autonomous strike, RF homing) is documented in the Hydra
+      repo itself.
+    </p>
+
+    <div class="section-label">
+      <p class="section-label__text">Requirements</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <ul>
+      <li>Base system bootstrap done (<code class="inline">02-base-system/01-base-bootstrap.sh</code>)</li>
+      <li><code class="inline">bash scripts/preflight.sh</code> passes</li>
+      <li>~7 GB free disk for the Docker image</li>
+      <li>USB camera (Logitech C270 / C920 or similar) plugged in</li>
+      <li>(Optional) Pixhawk wired and tested per <code class="inline">03-hardware/</code></li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Quick install</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash 04-apps/hydra-detect/install.sh
+</pre>
+    </div>
+
+    <p>The script:</p>
+    <ol>
+      <li>Clones the Hydra repo to <code class="inline">~/Hydra</code> (or pulls latest if it's already there). Needed for <code class="inline">config.ini.factory</code> and the systemd unit, which live in source.</li>
+      <li><strong>Pulls the pre-built <code class="inline">hydra-detect:latest</code> image from GHCR</strong> (<code class="inline">ghcr.io/rmeadomavic/hydra-detect:latest</code>). No compile step.</li>
+      <li>Asks 3 questions (MAVLink yes/no, MAVLink device, optional Tailscale already-up check).</li>
+      <li>Writes a sane <code class="inline">config.ini</code>.</li>
+      <li>Optionally installs Hydra as a systemd service (auto-start on boot).</li>
+      <li>Optionally launches it now.</li>
+    </ol>
+
+    <div class="section-label">
+      <p class="section-label__text">Force a local build instead</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>If you forked Hydra and want to test a code change, build from source instead of pulling.</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>HYDRA_BUILD=1 bash 04-apps/hydra-detect/install.sh
+</pre>
+    </div>
+
+    <p>This skips the GHCR pull and runs <code class="inline">docker build</code> against your local checkout. Takes ~2 minutes after the ~6 GB base image is cached.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">After install</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>Open the dashboard:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Browser</span><button class="term__copy">Copy</button></div>
+<pre class="term__body">http://&lt;jetson-ip&gt;:8080
+</pre>
+    </div>
+
+    <p>If Tailscale is up, use the Tailscale IP. Works from any of your tailnet devices. You should see a live camera feed with detection bounding boxes.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Updating Hydra later</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>Re-run the installer.</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>bash 04-apps/hydra-detect/install.sh
+</pre>
+    </div>
+
+    <p>It pulls the latest from <code class="inline">main</code>, rebuilds the image, restarts the service. The script preserves your <code class="inline">config.ini</code> and any data in <code class="inline">~/Hydra/output_data/</code>.</p>
+
+    <div class="section-label">
+      <p class="section-label__text">Common things that go wrong</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <h3>Camera not detected</h3>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>ls /dev/video*
+</pre>
+    </div>
+
+    <p>If empty, your camera isn't enumerated. Try a different USB port. Some USB-C hubs don't pass camera devices through cleanly.</p>
+
+    <h3>MAVLink won't connect</h3>
+
+    <p>You probably haven't run <code class="inline">03-hardware/02-test-mavlink.md</code>. Confirm <code class="inline">mavproxy</code> works first; Hydra uses the same connection.</p>
+
+    <h3>Dashboard says "no detections" but camera works</h3>
+
+    <p>Check that YOLO loaded (look at logs):</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo docker logs hydra-detect | head -50
+</pre>
+    </div>
+
+    <p>Look for <code class="inline">YOLO model loaded</code>. If you see "OOM" or "out of memory", you're trying to run a model bigger than 8 GB shared RAM allows. Switch to <code class="inline">yolov8n</code> (smallest) in <code class="inline">config.ini</code>.</p>
+
+    <h3><code class="inline">--runtime nvidia</code> errors / OpenCV import crash</h3>
+
+    <p>You ran the container without <code class="inline">--runtime nvidia</code>. Re-run the installer; it always uses <code class="inline">--runtime nvidia</code>. If you're invoking Docker manually, make sure you include <code class="inline">--runtime nvidia</code>.</p>
+
+    <h3>Update broke things</h3>
+
+    <p>Roll back to the last working version:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>cd ~/Hydra
+<span class="prompt">$ </span>git log --oneline | head -10  <span class="comment"># find the SHA you had before</span>
+<span class="prompt">$ </span>git checkout &lt;sha&gt;
+<span class="prompt">$ </span>docker build --network=host -t hydra-detect:latest .
+<span class="prompt">$ </span>sudo systemctl restart hydra-detect
+</pre>
+    </div>
+
+    <div class="section-label">
+      <p class="section-label__text">Where things live</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <table class="modern">
+      <thead>
+        <tr><th>Path</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code class="inline">~/Hydra/</code></td><td>The git repo</td></tr>
+        <tr><td><code class="inline">~/Hydra/config.ini</code></td><td>Your config (preserved across updates)</td></tr>
+        <tr><td><code class="inline">~/Hydra/output_data/</code></td><td>Detection logs, screenshots, video clips</td></tr>
+        <tr><td><code class="inline">~/Hydra/models/</code></td><td>YOLO <code class="inline">.pt</code> and <code class="inline">.engine</code> files</td></tr>
+        <tr><td><code class="inline">/etc/systemd/system/hydra-detect.service</code></td><td>systemd unit (if you enabled auto-start)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">
+      <p class="section-label__text">Operating Hydra</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <p>
+      Once installed, the dashboard is the interface; you do not need to SSH for normal use. The
+      relevant docs live in the Hydra repo at <code class="inline">~/Hydra/docs/</code> (vendored
+      offline copies are also installed there after the install script runs):
+    </p>
+
+    <ul>
+      <li><code class="inline">dashboard-user-guide.md</code>, every UI element explained</li>
+      <li><code class="inline">configuration.md</code>, every config knob</li>
+      <li><code class="inline">safety-review-2026-04-20.md</code>, the safety model and arming chain</li>
+      <li><code class="inline">tak-integration.md</code>, TAK / ATAK output</li>
+    </ul>
+
+    <div class="section-label">
+      <p class="section-label__text">Uninstall</p>
+      <div class="section-label__rule"></div>
+    </div>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo systemctl disable --now hydra-detect 2&gt;/dev/null || true
+<span class="prompt">$ </span>sudo docker rm -f hydra-detect 2&gt;/dev/null || true
+<span class="prompt">$ </span>sudo docker rmi hydra-detect:latest 2&gt;/dev/null || true
+<span class="prompt">$ </span>sudo rm -f /etc/systemd/system/hydra-detect.service
+<span class="comment"># Leaves ~/Hydra in place. Delete manually if you want.</span>
+</pre>
+    </div>
+
+    <h2>If you forked Hydra to a private repo</h2>
+
+    <p>
+      The default install pulls from a public repo and a public GHCR image, no auth needed. If
+      you forked Hydra to your own private repo and want the install script to use that fork:
+    </p>
+
+    <ol>
+      <li>
+        Authenticate the <code class="inline">gh</code> CLI on the Jetson:
+        <div class="term">
+          <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>sudo apt-get install -y gh
+<span class="prompt">$ </span>gh auth login
+<span class="comment"># Pick: GitHub.com -&gt; HTTPS -&gt; authenticate Git with credentials -&gt; login with browser</span>
+</pre>
+        </div>
+      </li>
+      <li>
+        Override the source URL when running install.sh:
+        <div class="term">
+          <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>HYDRA_REMOTE=https://github.com/YOUR-USER/Hydra.git \
+    HYDRA_BUILD=1 \
+    bash 04-apps/hydra-detect/install.sh
+</pre>
+        </div>
+        <p><code class="inline">HYDRA_BUILD=1</code> forces a local build (your fork doesn't have the public GHCR image).</p>
+      </li>
+    </ol>
+
+    <p>If you want a private GHCR image instead, override <code class="inline">HYDRA_IMAGE</code> and <code class="inline">docker login ghcr.io</code> first:</p>
+
+    <div class="term">
+      <div class="term__head"><span class="term__label">Shell · sorcc@jetson</span><button class="term__copy">Copy</button></div>
+<pre class="term__body"><span class="prompt">$ </span>echo "$GH_PAT" | docker login ghcr.io -u YOUR-USER --password-stdin
+<span class="prompt">$ </span>HYDRA_IMAGE=ghcr.io/YOUR-USER/hydra-detect:latest \
+    bash 04-apps/hydra-detect/install.sh
+</pre>
+    </div>
+
+    <label class="step__check" style="display:inline-flex;margin-top:32px;">
+      <input type="checkbox" data-step-key="sec-04-hydra" />
+      <span class="box"></span>
+      <span>Mark this step complete</span>
+    </label>
+
+    <div class="pagenav">
+      <a class="btn" href="index.html">‹ Apps overview</a>
+      <span class="pagenav__spacer"></span>
+      <a class="btn btn--primary" href="ollama.html">Ollama + Open WebUI ›</a>
+    </div>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">SORCC Jetson Handoff · v1.0</div>
+    <div class="site-footer__center">UNCLASSIFIED</div>
+    <div class="site-footer__right">CLS 02-26</div>
+  </div>
+</footer>
+
+<script src="../assets/sorcc.js"></script>
+</body>
+</html>
