@@ -11,8 +11,14 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 HYDRA_REMOTE="${HYDRA_REMOTE:-https://github.com/rmeadomavic/Hydra.git}"
 HYDRA_DIR="$HOME/Hydra"
+HYDRA_IMAGE="${HYDRA_IMAGE:-ghcr.io/rmeadomavic/hydra-detect:latest}"
 SERVICE_NAME="hydra-detect"
 NEED_RELOGIN=false
+
+# Force a local source build instead of pulling from ghcr by exporting
+# HYDRA_BUILD=1 before running. Useful if you've forked Hydra and want
+# to test a local change.
+HYDRA_BUILD="${HYDRA_BUILD:-0}"
 
 echo
 echo "==================================================="
@@ -31,7 +37,9 @@ if ! in_group docker; then
 fi
 
 # ── 1. Clone or update Hydra ──────────────────────────────────
-info "Step 1/5: Hydra repo"
+# We always need the repo — config.ini.factory and the systemd unit live in
+# source, not in the Docker image. The image only ships the runtime code.
+info "Step 1/5: Hydra repo (config + systemd unit)"
 if [ -d "$HYDRA_DIR/.git" ]; then
     info "Updating existing repo at $HYDRA_DIR"
     cd "$HYDRA_DIR"
@@ -48,11 +56,25 @@ else
 fi
 echo
 
-# ── 2. Build image ────────────────────────────────────────────
-info "Step 2/5: Build hydra-detect:latest"
-cd "$HYDRA_DIR"
-docker build --network=host -t hydra-detect:latest .
-ok "Image built"
+# ── 2. Image: pull from GHCR, fall back to local build ────────
+info "Step 2/5: Hydra Detect image"
+PULLED=0
+if [ "$HYDRA_BUILD" != "1" ]; then
+    info "Trying to pull pre-built image: $HYDRA_IMAGE"
+    if docker pull "$HYDRA_IMAGE" 2>&1 | tail -3; then
+        docker tag "$HYDRA_IMAGE" hydra-detect:latest
+        ok "Pulled $HYDRA_IMAGE and tagged as hydra-detect:latest"
+        PULLED=1
+    else
+        warn "Pull failed — falling back to local build"
+    fi
+fi
+if [ "$PULLED" -eq 0 ]; then
+    info "Building hydra-detect:latest from source (~2 min after base image pull)"
+    cd "$HYDRA_DIR"
+    docker build --network=host -t hydra-detect:latest .
+    ok "Image built locally"
+fi
 echo
 
 # ── 3. Configure ──────────────────────────────────────────────

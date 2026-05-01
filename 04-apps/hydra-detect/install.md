@@ -20,12 +20,22 @@ bash 04-apps/hydra-detect/install.sh
 
 The script:
 
-1. Clones the Hydra repo to `~/Hydra` (or pulls latest if it's already there)
-2. Builds the `hydra-detect:latest` Docker image (~2 minutes after base image)
+1. Clones the Hydra repo to `~/Hydra` (or pulls latest if it's already there) — needed for `config.ini.factory` and the systemd unit, which live in source
+2. **Pulls the pre-built `hydra-detect:latest` image from GHCR** (`ghcr.io/rmeadomavic/hydra-detect:latest`) — no compile step
 3. Asks 3 questions (MAVLink yes/no, MAVLink device, optional Tailscale already-up check)
 4. Writes a sane `config.ini`
 5. Optionally installs Hydra as a systemd service (auto-start on boot)
 6. Optionally launches it now
+
+### Force a local build instead
+
+If you forked Hydra and want to test a code change, build from source instead of pulling:
+
+```bash
+HYDRA_BUILD=1 bash 04-apps/hydra-detect/install.sh
+```
+
+This skips the GHCR pull and runs `docker build` against your local checkout. Takes ~2 minutes after the ~6 GB base image is cached.
 
 ## After install
 
@@ -116,4 +126,30 @@ sudo docker rm -f hydra-detect 2>/dev/null || true
 sudo docker rmi hydra-detect:latest 2>/dev/null || true
 sudo rm -f /etc/systemd/system/hydra-detect.service
 # Leaves ~/Hydra in place — delete manually if you want
+```
+
+## If you forked Hydra to a private repo
+
+The default install pulls from a public repo and a public GHCR image, no auth needed. If you forked Hydra to your own private repo and want the install script to use that fork:
+
+1. Authenticate the `gh` CLI on the Jetson:
+   ```bash
+   sudo apt-get install -y gh
+   gh auth login
+   # Pick: GitHub.com → HTTPS → authenticate Git with credentials → login with browser
+   ```
+2. Override the source URL when running install.sh:
+   ```bash
+   HYDRA_REMOTE=https://github.com/YOUR-USER/Hydra.git \
+   HYDRA_BUILD=1 \
+     bash 04-apps/hydra-detect/install.sh
+   ```
+   `HYDRA_BUILD=1` forces a local build (your fork doesn't have the public GHCR image).
+
+If you want a private GHCR image instead, override `HYDRA_IMAGE` and `docker login ghcr.io` first:
+
+```bash
+echo "$GH_PAT" | docker login ghcr.io -u YOUR-USER --password-stdin
+HYDRA_IMAGE=ghcr.io/YOUR-USER/hydra-detect:latest \
+  bash 04-apps/hydra-detect/install.sh
 ```
