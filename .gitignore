@@ -1,3 +1,9 @@
+# Internal-only working folders — must never be committed to the public repo.
+# Brand specs, design exports, internal notes live here locally.
+brand/
+_dev/
+_internal/
+
 # Local artifacts
 *.log
 *.swp
