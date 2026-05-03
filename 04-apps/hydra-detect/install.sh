@@ -136,6 +136,56 @@ fi
 
 mkdir -p "$HYDRA_DIR/models" "$HYDRA_DIR/output_data"
 ok "Data dirs ready"
+
+# ── 3b. .env provisioning ──────────────────────────────────────
+# The hydra-detect entrypoint loads .env to inject HYDRA_API_TOKEN and
+# the optional per-host MAVLink overrides. .env is gitignored; freshly
+# imaged Jetsons need one provisioned so the systemd unit's
+# EnvironmentFile pointer resolves.
+HYDRA_ENV="$HYDRA_DIR/.env"
+HYDRA_ENV_EXAMPLE="$HYDRA_DIR/.env.example"
+
+if [ ! -f "$HYDRA_ENV_EXAMPLE" ]; then
+    warn "$HYDRA_ENV_EXAMPLE not found in repo — skipping .env provisioning."
+    warn "Hydra will run without HYDRA_API_TOKEN; auth-gated endpoints disabled."
+elif [ -f "$HYDRA_ENV" ]; then
+    # Existing .env preserved. Just check the placeholder token wasn't left in.
+    if grep -q '^HYDRA_API_TOKEN=your-token-here' "$HYDRA_ENV"; then
+        warn "$HYDRA_ENV still has the placeholder token. Generating a fresh one."
+        if command -v openssl >/dev/null 2>&1; then
+            NEW_TOKEN="$(openssl rand -hex 32)"
+            sed -i "s|^HYDRA_API_TOKEN=your-token-here|HYDRA_API_TOKEN=${NEW_TOKEN}|" "$HYDRA_ENV"
+            ok "HYDRA_API_TOKEN replaced with a fresh 64-char hex token"
+        else
+            warn "openssl not installed — replace HYDRA_API_TOKEN=your-token-here in $HYDRA_ENV manually"
+        fi
+    else
+        info "Existing .env preserved (token already set)"
+    fi
+else
+    cp "$HYDRA_ENV_EXAMPLE" "$HYDRA_ENV"
+    chmod 600 "$HYDRA_ENV"
+    if command -v openssl >/dev/null 2>&1; then
+        NEW_TOKEN="$(openssl rand -hex 32)"
+        sed -i "s|^HYDRA_API_TOKEN=your-token-here|HYDRA_API_TOKEN=${NEW_TOKEN}|" "$HYDRA_ENV"
+        ok "Created $HYDRA_ENV (mode 600) with a generated HYDRA_API_TOKEN"
+    else
+        warn "openssl not installed — set HYDRA_API_TOKEN in $HYDRA_ENV manually"
+        ok "Created $HYDRA_ENV (mode 600) from .env.example — token still placeholder"
+    fi
+
+    # If the operator selected a non-default flight-controller device above,
+    # bake the per-host overrides into .env so future re-runs / reimages do
+    # not need manual MAVLink reconfiguration.
+    if [ -n "${MAVLINK_DEVICE:-}" ] && [ "$MAVLINK_DEVICE" != "/dev/ttyACM0" ]; then
+        sed -i "s|^# HYDRA_MAVLINK_DEVICE=.*|HYDRA_MAVLINK_DEVICE=${MAVLINK_DEVICE}|" "$HYDRA_ENV"
+        ok "Set HYDRA_MAVLINK_DEVICE=${MAVLINK_DEVICE} in .env"
+    fi
+    if [ -n "${MAVLINK_BAUD:-}" ] && [ "$MAVLINK_BAUD" != "115200" ]; then
+        sed -i "s|^# HYDRA_MAVLINK_BAUD=.*|HYDRA_MAVLINK_BAUD=${MAVLINK_BAUD}|" "$HYDRA_ENV"
+        ok "Set HYDRA_MAVLINK_BAUD=${MAVLINK_BAUD} in .env"
+    fi
+fi
 echo
 
 # ── 4. systemd service (optional) ─────────────────────────────
