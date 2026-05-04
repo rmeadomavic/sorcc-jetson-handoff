@@ -106,13 +106,8 @@ Expected first line:
 If you see `R36` — JetPack 6 is alive.
 
 ```bash
-docker --version
-# Expected: Docker version 27.x or newer
-```
-
-```bash
 df -h /
 # Should show your SD card with most of it as free space.
 ```
 
-You're good. Onwards.
+You're good. Docker comes in Section 02. Onwards.
