@@ -136,6 +136,20 @@ fi
 
 mkdir -p "$HYDRA_DIR/models" "$HYDRA_DIR/output_data"
 ok "Data dirs ready"
+
+# Provision /etc/hydra/hydra.env if absent. hydra-detect.service declares
+# EnvironmentFile=-/etc/hydra/hydra.env; without the file HYDRA_API_TOKEN
+# is unset and Hydra logs a warning on every start.
+HYDRA_ENV=/etc/hydra/hydra.env
+if [ ! -f "$HYDRA_ENV" ]; then
+    sudo mkdir -p /etc/hydra
+    printf '# Hydra runtime secrets\n# Set HYDRA_API_TOKEN to restrict external API access (optional for local use).\nHYDRA_API_TOKEN=\n' \
+        | sudo tee "$HYDRA_ENV" >/dev/null
+    sudo chmod 600 "$HYDRA_ENV"
+    warn "Created $HYDRA_ENV — edit to set HYDRA_API_TOKEN if needed"
+else
+    info "Existing $HYDRA_ENV preserved"
+fi
 echo
 
 # ── 4. systemd service (optional) ─────────────────────────────
