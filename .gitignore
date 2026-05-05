@@ -17,3 +17,12 @@ Thumbs.db
 # Build artifacts (none expected, but just in case)
 *.tar.gz
 *.zip
+
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*_secret
+*_token
